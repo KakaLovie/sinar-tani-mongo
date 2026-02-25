@@ -1,91 +1,149 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Dashboard — Sinar Tani</title>
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <style>
+:root{
+    --g900:#14532d;--g700:#166534;--g500:#16a34a;--g300:#4ade80;
+    --b700:#1d4ed8;--b500:#3b82f6;--b300:#93c5fd;
+    --o500:#f59e0b;--o300:#fcd34d;
+    --r500:#dc2626;--r300:#fca5a5;
+    --bg:#f0f9f4;--card:#fff;--text:#1f2937;--muted:#6b7280;
+    --shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -1px rgba(0,0,0,.06);
+    --shadow-lg:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -2px rgba(0,0,0,.05);
+    --r:16px;
+}
 *{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI',sans-serif;background:#f0f4f0;color:#333;}
-.mc{margin-left:260px;padding:28px;}
-.header{background:#fff;border-radius:16px;padding:22px 28px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 12px rgba(0,0,0,.06);}
-.header-left h1{font-size:1.5rem;color:#1e3d1a;font-weight:700;}
-.header-left p{color:#888;font-size:.88rem;margin-top:3px;}
-.user-chip{display:flex;align-items:center;gap:10px;}
-.ua{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#4CAF50,#81c784);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.1rem;}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:var(--bg);color:var(--text);min-height:100vh;}
+
+/* Sidebar Toggle */
+.menu-toggle{position:fixed;top:20px;left:280px;z-index:1001;background:var(--g500);color:#fff;border:none;width:44px;height:44px;border-radius:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.2rem;box-shadow:0 4px 12px rgba(22,163,74,.3);transition:all .3s;}
+.menu-toggle:hover{background:var(--g700);transform:scale(1.05);}
+.sidebar.minimized~.menu-toggle{left:100px;}
+.sidebar.minimized{width:80px;padding:20px 10px;}
+.sidebar.minimized .sidebar-header h2 span,.sidebar.minimized .sidebar-menu a span,.sidebar.minimized .sidebar-user{display:none;}
+.sidebar.minimized .sidebar-header{padding:10px 0;}
+.sidebar.minimized .sidebar-header h2{justify-content:center;}
+.sidebar.minimized .sidebar-menu a{justify-content:center;padding:12px;}
+.sidebar.minimized .sidebar-menu i{font-size:1.3rem;}
+
+.mc{margin-left:260px;padding:28px;transition:margin-left .3s;}
+.sidebar.minimized~.mc{margin-left:80px;}
+.sidebar.minimized~.menu-toggle i::before{content:'\f067';}
+
+.header{background:linear-gradient(135deg,var(--card) 0%,#f0fdf4 100%);border-radius:var(--r);padding:24px 32px;margin-bottom:24px;box-shadow:var(--shadow);display:flex;justify-content:space-between;align-items:center;border:1px solid rgba(22,163,74,.1);}
+.header-left h1{font-size:1.6rem;color:var(--g700);font-weight:700;display:flex;align-items:center;gap:10px;}
+.header-left p{color:var(--muted);font-size:.9rem;margin-top:4px;}
+.user-chip{display:flex;align-items:center;gap:10px;padding:8px 16px;background:rgba(22,163,74,.1);border-radius:20px;}
+.ua{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,var(--g500),var(--g300));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1rem;}
+
 /* Stats */
 .stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
-.sc{background:#fff;border-radius:16px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.06);transition:transform .3s;cursor:default;}
-.sc:hover{transform:translateY(-4px);}
-.sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
-.si{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
-.si.g{background:#dcfce7;color:#16a34a;} .si.b{background:#dbeafe;color:#2563eb;}
-.si.o{background:#fef3c7;color:#d97706;} .si.r{background:#fee2e2;color:#dc2626;}
-.sv{font-size:2.2rem;font-weight:700;color:#1a1a1a;line-height:1;}
-.sl{font-size:.82rem;color:#888;margin-top:4px;}
-.stag{font-size:.78rem;margin-top:10px;display:flex;align-items:center;gap:5px;}
+.sc{background:var(--card);border-radius:var(--r);padding:24px;box-shadow:var(--shadow);transition:all .3s;cursor:default;position:relative;overflow:hidden;border:1px solid rgba(22,163,74,.1);}
+.sc:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);}
+.sc::before{content:'';position:absolute;right:-30px;top:-30px;width:100px;height:100px;border-radius:50%;opacity:.08;}
+.sc.g::before{background:var(--g500);}
+.sc.b::before{background:var(--b500);}
+.sc.o::before{background:var(--o500);}
+.sc.r::before{background:var(--r500);}
+.sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;}
+.si{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+.si.g{background:#dcfce7;color:var(--g500);}
+.si.b{background:#dbeafe;color:var(--b500);}
+.si.o{background:#fef3c7;color:var(--o500);}
+.si.r{background:#fee2e2;color:var(--r500);}
+.sv{font-size:2.2rem;font-weight:700;color:var(--text);line-height:1;}
+.sl{font-size:.85rem;color:var(--muted);margin-top:4px;}
+.stag{font-size:.8rem;margin-top:12px;display:flex;align-items:center;gap:6px;padding:6px 10px;background:rgba(22,163,74,.1);border-radius:20px;width:fit-content;color:var(--g700);font-weight:600;}
+
 /* Hama banner */
-.hama-banner{display:none;background:linear-gradient(135deg,#fee2e2,#fff5f5);border:1.5px solid #fecaca;border-radius:14px;padding:16px 22px;margin-bottom:24px;align-items:center;gap:14px;}
-.hb-icon{width:44px;height:44px;background:#fee2e2;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;animation:hbPulse 2s infinite;}
-@keyframes hbPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.4);}50%{box-shadow:0 0 0 8px rgba(220,38,38,0);}}
-.hb-text h4{font-weight:700;color:#991b1b;margin-bottom:3px;}
-.hb-text p{font-size:.85rem;color:#b91c1c;}
-.hb-btn{padding:9px 20px;background:#dc2626;color:#fff;border-radius:20px;text-decoration:none;font-size:.85rem;font-weight:700;flex-shrink:0;margin-left:auto;transition:all .2s;}
-.hb-btn:hover{background:#b91c1c;}
+.hama-banner{display:none;background:linear-gradient(135deg,#fee2e2,#fef2f2);border:2px solid #fecaca;border-radius:var(--r);padding:18px 24px;margin-bottom:24px;align-items:center;gap:16px;animation:slideIn .4s ease;}
+@keyframes slideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.hb-icon{width:50px;height:50px;background:#fee2e2;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;flex-shrink:0;animation:hbPulse 2s infinite;}
+@keyframes hbPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.4);}50%{box-shadow:0 0 0 10px rgba(220,38,38,0);}}
+.hb-text h4{font-weight:700;color:#991b1b;margin-bottom:4px;font-size:1.05rem;}
+.hb-text p{font-size:.88rem;color:#b91c1c;}
+.hb-btn{padding:10px 22px;background:var(--r500);color:#fff;border-radius:20px;text-decoration:none;font-size:.88rem;font-weight:700;flex-shrink:0;margin-left:auto;transition:all .3s;display:flex;align-items:center;gap:8px;}
+.hb-btn:hover{background:#b91c1c;transform:translateY(-2px);}
+
+/* Quick links */
+.qlinks{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:24px;}
+.ql{display:flex;flex-direction:column;align-items:center;gap:10px;padding:24px 16px;background:var(--card);border-radius:var(--r);text-decoration:none;color:var(--text);box-shadow:var(--shadow);transition:all .3s;text-align:center;border:1px solid rgba(0,0,0,.05);}
+.ql:hover{transform:translateY(-6px);box-shadow:var(--shadow-lg);border-color:transparent;}
+.ql i{font-size:2rem;}
+.ql.g i{color:var(--g500);}
+.ql.b i{color:var(--b500);}
+.ql.o i{color:var(--o500);}
+.ql.p i{color:#7c3aed;}
+.ql.r i{color:var(--r500);}
+.ql.t i{color:#0891b2;}
+.ql span{font-size:.88rem;font-weight:600;color:var(--text);}
+
 /* Content grid */
 .grid2{display:grid;grid-template-columns:2fr 1fr;gap:20px;}
-.card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.06);}
-.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
-.ct{font-size:1.05rem;font-weight:700;color:#1e3d1a;display:flex;align-items:center;gap:8px;}
-.btn-sm{padding:6px 16px;background:#4CAF50;color:#fff;border:none;border-radius:20px;font-size:.82rem;cursor:pointer;text-decoration:none;transition:all .2s;}
-.btn-sm:hover{background:#2d5a27;}
-/* Quick links */
-.qlinks{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
-.ql{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 12px;background:#fff;border-radius:14px;text-decoration:none;color:#333;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s;text-align:center;}
-.ql:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.1);}
-.ql i{font-size:1.8rem;}
-.ql.g i{color:#16a34a;} .ql.b i{color:#2563eb;} .ql.o i{color:#d97706;}
-.ql.p i{color:#7c3aed;} .ql.r i{color:#dc2626;} .ql.t i{color:#0891b2;}
-.ql span{font-size:.82rem;font-weight:600;}
+.card{background:var(--card);border-radius:var(--r);padding:24px;box-shadow:var(--shadow);border:1px solid rgba(0,0,0,.05);}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;padding-bottom:12px;border-bottom:2px solid #f3f4f6;}
+.ct{font-size:1.05rem;font-weight:700;color:var(--g700);display:flex;align-items:center;gap:8px;}
+.btn-sm{padding:8px 18px;background:var(--g500);color:#fff;border:none;border-radius:20px;font-size:.85rem;cursor:pointer;text-decoration:none;transition:all .3s;font-weight:600;display:inline-flex;align-items:center;gap:6px;}
+.btn-sm:hover{background:var(--g700);transform:translateY(-2px);}
+
 /* Harga table */
 .ht{width:100%;border-collapse:collapse;}
-.ht td{padding:10px 0;border-bottom:1px solid #f3f4f6;font-size:.88rem;}
+.ht td{padding:12px 0;border-bottom:1px solid #f3f4f6;font-size:.9rem;}
 .ht tr:last-child td{border-bottom:none;}
-.harga-val{font-weight:700;color:#2d5a27;}
-.plus{color:#16a34a;font-size:.75rem;} .minus{color:#dc2626;font-size:.75rem;}
+.ht tr:hover td{background:#f9fafb;}
+.harga-val{font-weight:700;color:var(--g700);font-size:.95rem;}
+.plus{color:var(--g500);font-size:.8rem;font-weight:600;}
+.minus{color:var(--r500);font-size:.8rem;font-weight:600;}
+
 /* Hama list */
-.hama-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f3f4f6;font-size:.85rem;}
+.hama-item{display:flex;align-items:center;gap:12px;padding:12px 0;border-bottom:1px solid #f3f4f6;font-size:.9rem;transition:all .2s;}
 .hama-item:last-child{border-bottom:none;}
-.hd{width:4px;height:40px;border-radius:4px;flex-shrink:0;}
-.kritis{background:#dc2626;} .berat{background:#ef4444;} .sedang{background:#f59e0b;} .ringan{background:#22c55e;}
+.hama-item:hover{background:#f9fafb;padding-left:8px;padding-right:8px;margin-left:-8px;margin-right:-8px;border-radius:8px;}
+.hd{width:5px;height:44px;border-radius:5px;flex-shrink:0;}
+.kritis{background:var(--r500);}
+.berat{background:#ef4444;}
+.sedang{background:var(--o500);}
+.ringan{background:var(--g500);}
 .hama-info{flex:1;min-width:0;}
-.hama-name{font-weight:600;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
-.hama-meta{color:#999;font-size:.75rem;margin-top:2px;}
-.hbadge{padding:2px 8px;border-radius:8px;font-size:.7rem;font-weight:700;flex-shrink:0;}
-.hbk{background:#fee2e2;color:#dc2626;} .hbb{background:#fee2e2;color:#ef4444;}
-.hbs{background:#fef3c7;color:#d97706;} .hbr{background:#dcfce7;color:#16a34a;}
+.hama-name{font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hama-meta{color:var(--muted);font-size:.8rem;margin-top:3px;}
+.hbadge{padding:4px 10px;border-radius:12px;font-size:.75rem;font-weight:700;flex-shrink:0;}
+.hbk{background:#fee2e2;color:var(--r500);}
+.hbb{background:#fee2e2;color:#ef4444;}
+.hbs{background:#fef3c7;color:var(--o500);}
+.hbr{background:#dcfce7;color:var(--g500);}
+
 @media(max-width:1200px){.stats{grid-template-columns:repeat(2,1fr);}.grid2{grid-template-columns:1fr;}.qlinks{grid-template-columns:repeat(3,1fr);}}
 @media(max-width:1024px){.mc{margin-left:0;padding:16px;}}
-@media(max-width:600px){.qlinks{grid-template-columns:repeat(2,1fr);}.stats{grid-template-columns:repeat(2,1fr);}}
+@media(max-width:768px){.qlinks{grid-template-columns:repeat(2,1fr);}.stats{grid-template-columns:1fr;}.header{flex-direction:column;gap:16px;align-items:flex-start;}}
 </style>
 </head>
 <body>
 <%- include('partials/sidebar', { active: 'dashboard' }) %>
+
+<button class="menu-toggle" onclick="toggleSidebar()" title="Toggle Menu">
+    <i class="fas fa-bars"></i>
+</button>
+
 <main class="mc">
   <div class="header">
     <div class="header-left">
-      <h1>🌾 Dashboard Sinar Tani</h1>
+      <h1><i class="fas fa-home"></i> Dashboard Sinar Tani</h1>
       <p><% if(user){%>Selamat datang kembali, <strong><%= user.nama %></strong>!<%}else{%>Selamat datang di platform pertanian digital Indonesia.<%}%></p>
     </div>
-    <% if(user){ %><div class="user-chip"><div class="ua"><%= user.nama.charAt(0).toUpperCase() %></div><span style="font-size:.88rem;color:#666;font-weight:600;"><%= user.nama.split(' ')[0] %></span></div><% } %>
+    <% if(user){ %><div class="user-chip"><div class="ua"><%= user.nama.charAt(0).toUpperCase() %></div><span style="font-size:.88rem;color:var(--g700);font-weight:600;"><%= user.nama.split(' ')[0] %></span></div><% } %>
   </div>
 
   <!-- Stats -->
   <div class="stats">
-    <div class="sc"><div class="sc-top"><div><div class="sv" id="statPetani">—</div><div class="sl">Total Pengguna</div></div><div class="si g"><i class="fas fa-users"></i></div></div><div class="stag" style="color:#16a34a;"><i class="fas fa-seedling"></i> Terdaftar di platform</div></div>
-    <div class="sc"><div class="sc-top"><div><div class="sv" id="statProduk">—</div><div class="sl">Produk di Pasar</div></div><div class="si b"><i class="fas fa-store"></i></div></div><div class="stag" style="color:#2563eb;"><i class="fas fa-box"></i> Produk aktif dijual</div></div>
-    <div class="sc" style="cursor:pointer;" onclick="window.location='/k-map'"><div class="sc-top"><div><div class="sv" id="statHama">—</div><div class="sl">Serangan Hama Aktif</div></div><div class="si o"><i class="fas fa-bug"></i></div></div><div class="stag" id="hamaTag" style="color:#d97706;"><i class="fas fa-satellite-dish"></i> Klik untuk lihat radar</div></div>
-    <div class="sc"><div class="sc-top"><div><div class="sv" id="statBantuan">—</div><div class="sl">Program Bantuan</div></div><div class="si r"><i class="fas fa-hands-helping"></i></div></div><div class="stag" style="color:#dc2626;"><i class="fas fa-landmark"></i> Dari dinas pertanian</div></div>
+    <div class="sc g"><div class="sc-top"><div><div class="sv" id="statPetani">—</div><div class="sl">Total Pengguna</div></div><div class="si g"><i class="fas fa-users"></i></div></div><div class="stag"><i class="fas fa-seedling"></i> Terdaftar di platform</div></div>
+    <div class="sc b"><div class="sc-top"><div><div class="sv" id="statProduk">—</div><div class="sl">Produk di Pasar</div></div><div class="si b"><i class="fas fa-store"></i></div></div><div class="stag" style="background:rgba(59,130,246,.1);color:var(--b700);"><i class="fas fa-box"></i> Produk aktif dijual</div></div>
+    <div class="sc o" style="cursor:pointer;" onclick="window.location='/k-map'"><div class="sc-top"><div><div class="sv" id="statHama">—</div><div class="sl">Serangan Hama Aktif</div></div><div class="si o"><i class="fas fa-bug"></i></div></div><div class="stag" id="hamaTag" style="background:rgba(245,158,11,.1);color:#b45309;"><i class="fas fa-satellite-dish"></i> Klik untuk lihat radar</div></div>
+    <div class="sc r"><div class="sc-top"><div><div class="sv" id="statBantuan">—</div><div class="sl">Program Bantuan</div></div><div class="si r"><i class="fas fa-hands-helping"></i></div></div><div class="stag" style="background:rgba(220,38,38,.1);color:var(--r500);"><i class="fas fa-landmark"></i> Dari dinas pertanian</div></div>
   </div>
 
   <!-- Hama alert banner -->
@@ -108,17 +166,22 @@ body{font-family:'Segoe UI',sans-serif;background:#f0f4f0;color:#333;}
   <!-- Content grid -->
   <div class="grid2">
     <div class="card">
-      <div class="ch"><div class="ct"><i class="fas fa-chart-line" style="color:#2563eb;"></i> Harga Komoditas</div><a href="#" class="btn-sm" onclick="loadHarga()">Refresh</a></div>
-      <table class="ht" id="hargaTable"><tr><td style="text-align:center;color:#999;padding:24px;">Memuat data harga...</td></tr></table>
+      <div class="ch"><div class="ct"><i class="fas fa-chart-line" style="color:var(--b500);"></i> Harga Komoditas</div><a href="#" class="btn-sm" onclick="loadHarga();return false;"><i class="fas fa-sync-alt"></i> Refresh</a></div>
+      <table class="ht" id="hargaTable"><tr><td style="text-align:center;color:#999;padding:24px;"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i><br><br>Memuat data harga...</td></tr></table>
     </div>
     <div class="card">
-      <div class="ch"><div class="ct"><i class="fas fa-broadcast-tower" style="color:#dc2626;"></i> Radar Hama</div><a href="/k-map" class="btn-sm">Lihat Peta</a></div>
-      <div id="hamaList"><div style="text-align:center;color:#999;padding:20px;">Memuat data...</div></div>
+      <div class="ch"><div class="ct"><i class="fas fa-broadcast-tower" style="color:var(--r500);"></i> Radar Hama</div><a href="/k-map" class="btn-sm"><i class="fas fa-map"></i> Lihat Peta</a></div>
+      <div id="hamaList"><div style="text-align:center;color:#999;padding:20px;"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;"></i><br><br>Memuat data...</div></div>
     </div>
   </div>
 </main>
 
 <script>
+// Sidebar toggle
+function toggleSidebar() {
+    document.querySelector('.sidebar').classList.toggle('minimized');
+}
+
 // Animate counter function
 function animateCounter(elementId, target, duration = 1000) {
   const el = document.getElementById(elementId);
@@ -127,7 +190,7 @@ function animateCounter(elementId, target, duration = 1000) {
   const increment = target >= 1000 ? Math.ceil(target / 50) : 1;
   let current = start;
   const stepTime = duration / (target / increment);
-  
+
   const timer = setInterval(() => {
     current += increment;
     if (current >= target) {
@@ -144,25 +207,22 @@ async function loadStats() {
     const j = await r.json();
     if (!j.sukses) return;
     const d = j.data;
-    
+
     // Animate stats
     animateCounter('statPetani', d.total_petani || 0);
     animateCounter('statProduk', d.total_produk || 0);
     animateCounter('statHama', d.hama_aktif || 0);
     animateCounter('statBantuan', d.total_bantuan || 0);
-    
+
     if (d.hama_kritis > 0) {
       document.getElementById('hamaBanner').style.display = 'flex';
       document.getElementById('hamaMsg').textContent = d.hama_kritis + ' serangan KRITIS terdeteksi di berbagai wilayah!';
       document.getElementById('hamaTag').innerHTML = '<i class="fas fa-skull-crossbones"></i> ' + d.hama_kritis + ' serangan KRITIS!';
+      document.getElementById('hamaTag').style.background = 'rgba(220,38,38,.1)';
       document.getElementById('hamaTag').style.color = '#dc2626';
     }
   } catch (err) {
     console.error('Failed to load stats:', err);
-    document.getElementById('statPetani').textContent = '—';
-    document.getElementById('statProduk').textContent = '—';
-    document.getElementById('statHama').textContent = '—';
-    document.getElementById('statBantuan').textContent = '—';
   }
 }
 
@@ -171,26 +231,26 @@ async function loadHarga() {
     const r = await fetch('/api/harga/terkini');
     const j = await r.json();
     const tbl = document.getElementById('hargaTable');
-    
+
     if (!j.sukses) {
-      tbl.innerHTML = '<tr><td style="color:#ef4444;text-align:center;padding:20px;">Gagal memuat data harga.</td></tr>';
+      tbl.innerHTML = '<tr><td style="color:#ef4444;text-align:center;padding:20px;"><i class="fas fa-exclamation-triangle"></i><br><br>Gagal memuat data harga.</td></tr>';
       return;
     }
-    
+
     if (!j.data.length) {
-      tbl.innerHTML = '<tr><td style="color:#999;text-align:center;padding:20px;"><i class="fas fa-info-circle"></i> Data tidak tersedia</td></tr>';
+      tbl.innerHTML = '<tr><td style="color:#999;text-align:center;padding:20px;"><i class="fas fa-info-circle"></i><br><br>Data tidak tersedia</td></tr>';
       return;
     }
-    
+
     tbl.innerHTML = j.data.slice(0,8).map(h => `
       <tr>
         <td><strong>${h.nama}</strong><br><span style="font-size:.75rem;color:#999;">${h.satuan||'kg'}</span></td>
         <td class="harga-val">Rp ${Number(h.harga).toLocaleString('id-ID')}</td>
-        <td>${(h.perubahan||0) >= 0 ? '<span class="plus">▲ '+Math.abs(h.perubahan||0)+'%</span>' : '<span class="minus">▼ '+Math.abs(h.perubahan||0)+'%</span>'}</td>
+        <td>${(h.perubahan||0) >= 0 ? '<span class="plus"><i class="fas fa-arrow-up"></i> '+Math.abs(h.perubahan||0)+'%</span>' : '<span class="minus"><i class="fas fa-arrow-down"></i> '+Math.abs(h.perubahan||0)+'%</span>'}</td>
       </tr>`).join('');
   } catch (err) {
     console.error('Failed to load prices:', err);
-    document.getElementById('hargaTable').innerHTML = '<tr><td style="color:#ef4444;text-align:center;padding:20px;"><i class="fas fa-exclamation-triangle"></i> Gagal memuat harga</td></tr>';
+    document.getElementById('hargaTable').innerHTML = '<tr><td style="color:#ef4444;text-align:center;padding:20px;"><i class="fas fa-exclamation-triangle"></i><br><br>Gagal memuat harga</td></tr>';
   }
 }
 
@@ -199,17 +259,17 @@ async function loadHama() {
     const r = await fetch('/api/hama?limit=5&status=aktif');
     const j = await r.json();
     const container = document.getElementById('hamaList');
-    
+
     if (!j.sukses) {
-      container.innerHTML = '<div style="text-align:center;color:#ef4444;padding:16px;"><i class="fas fa-exclamation-triangle"></i><br><small>Gagal memuat data</small></div>';
+      container.innerHTML = '<div style="text-align:center;color:#ef4444;padding:16px;"><i class="fas fa-exclamation-triangle"></i><br><br>Gagal memuat data</div>';
       return;
     }
-    
+
     if (!j.data.length) {
-      container.innerHTML = '<div style="text-align:center;color:#22c55e;padding:16px;"><i class="fas fa-check-circle" style="font-size:1.5rem;"></i><br><small>Tidak ada hama aktif</small></div>';
+      container.innerHTML = '<div style="text-align:center;color:var(--g500);padding:16px;"><i class="fas fa-check-circle" style="font-size:2rem;"></i><br><br>Tidak ada hama aktif</div>';
       return;
     }
-    
+
     container.innerHTML = j.data.map(h => `
       <div class="hama-item">
         <div class="hd ${h.tingkat_serangan}"></div>
@@ -221,7 +281,7 @@ async function loadHama() {
       </div>`).join('');
   } catch (err) {
     console.error('Failed to load hama:', err);
-    document.getElementById('hamaList').innerHTML = '<div style="text-align:center;color:#ef4444;padding:16px;"><i class="fas fa-exclamation-triangle"></i><br><small>Gagal memuat data</small></div>';
+    document.getElementById('hamaList').innerHTML = '<div style="text-align:center;color:#ef4444;padding:16px;"><i class="fas fa-exclamation-triangle"></i><br><br>Gagal memuat data</div>';
   }
 }
 

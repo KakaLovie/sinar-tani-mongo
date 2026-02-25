@@ -6,97 +6,420 @@
     <title>Kalkulator Tani - Sinar Tani</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; color: #333; }
-        .sidebar {
-            position: fixed; left: 0; top: 0; width: 260px; height: 100vh;
-            background: linear-gradient(180deg, #2d5a27 0%, #1e3d1a 100%);
-            color: white; padding: 20px; overflow-y: auto; z-index: 1000;
+        :root {
+            --primary: #16a34a;
+            --primary-dark: #15803d;
+            --primary-light: #22c55e;
+            --secondary: #7c3aed;
+            --accent: #f59e0b;
+            --danger: #dc2626;
+            --bg: #f0f9f4;
+            --card: #ffffff;
+            --text: #1f2937;
+            --text-muted: #6b7280;
+            --border: #e5e7eb;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 16px;
         }
-        .sidebar-header { text-align: center; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .sidebar-header h2 { font-size: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .sidebar-menu { list-style: none; margin-top: 30px; }
-        .sidebar-menu li { margin-bottom: 10px; }
-        .sidebar-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.8); text-decoration: none; border-radius: 10px; transition: all 0.3s; }
-        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.1); color: white; transform: translateX(5px); }
-        .main-content { margin-left: 260px; padding: 30px; }
-        .header { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
-        .header h1 { color: #2d5a27; font-size: 1.8rem; }
-        .calculator-container { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
-        .calc-card { background: white; border-radius: 15px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
-        .calc-card h2 { color: #2d5a27; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
-        .form-group { margin-bottom: 20px; }
-        .form-group label { display: block; margin-bottom: 8px; color: #555; font-weight: 500; }
-        .form-group input, .form-group select { width: 100%; padding: 12px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; transition: border-color 0.3s; }
-        .form-group input:focus, .form-group select:focus { outline: none; border-color: #4CAF50; }
-        .harga-hint { font-size: 0.8rem; color: #4CAF50; margin-top: 4px; display: none; }
-        .btn-calculate { width: 100%; padding: 15px; background: linear-gradient(45deg, #4CAF50, #45a049); color: white; border: none; border-radius: 10px; font-size: 1.1rem; font-weight: bold; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
-        .btn-calculate:hover { transform: translateY(-2px); box-shadow: 0 10px 20px rgba(76,175,80,0.3); }
-        .result-box { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 25px; border-radius: 15px; margin-top: 20px; text-align: center; }
-        .result-box h3 { font-size: 1.2rem; margin-bottom: 10px; opacity: 0.9; }
-        .result-value { font-size: 2.5rem; font-weight: bold; margin-bottom: 5px; }
-        .result-detail { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
-        .detail-item { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 10px; text-align: center; }
-        .detail-item small { opacity: 0.8; display: block; margin-bottom: 5px; }
-        .detail-item strong { font-size: 1.2rem; }
-        .tips-box { background: #fff3e0; border-left: 4px solid #FF9800; padding: 20px; border-radius: 10px; margin-top: 20px; }
-        .tips-box h4 { color: #e65100; margin-bottom: 10px; }
-        .tips-box ul { margin-left: 20px; color: #666; }
-        .tips-box li { margin-bottom: 5px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        
+        /* Sidebar Toggle */
+        .menu-toggle {
+            position: fixed;
+            top: 20px;
+            left: 280px;
+            z-index: 1001;
+            background: var(--primary);
+            color: white;
+            border: none;
+            width: 44px;
+            height: 44px;
+            border-radius: 12px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            box-shadow: var(--shadow-lg);
+            transition: all 0.3s ease;
+        }
+        .menu-toggle:hover {
+            background: var(--primary-dark);
+            transform: scale(1.05);
+        }
+        .sidebar.minimized ~ .menu-toggle {
+            left: 100px;
+        }
+        .sidebar.minimized {
+            width: 80px;
+            padding: 20px 10px;
+        }
+        .sidebar.minimized .sidebar-header h2 span,
+        .sidebar.minimized .sidebar-menu a span,
+        .sidebar.minimized .sidebar-user {
+            display: none;
+        }
+        .sidebar.minimized .sidebar-header {
+            padding: 10px 0;
+        }
+        .sidebar.minimized .sidebar-header h2 {
+            justify-content: center;
+        }
+        .sidebar.minimized .sidebar-menu a {
+            justify-content: center;
+            padding: 12px;
+        }
+        .sidebar.minimized .sidebar-menu i {
+            font-size: 1.3rem;
+        }
+
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: 260px;
+            height: 100vh;
+            background: linear-gradient(180deg, #166534 0%, #14532d 100%);
+            color: white;
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar-header {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .sidebar-header h2 {
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            color: #86efac;
+        }
+        .sidebar-menu {
+            list-style: none;
+            margin-top: 30px;
+        }
+        .sidebar-menu li {
+            margin-bottom: 8px;
+        }
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            color: rgba(255, 255, 255, 0.85);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 500;
+        }
+        .sidebar-menu a:hover,
+        .sidebar-menu a.active {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            transform: translateX(5px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .sidebar-menu i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        .main-content {
+            margin-left: 260px;
+            padding: 30px;
+            transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .sidebar.minimized ~ .main-content {
+            margin-left: 80px;
+        }
+        .sidebar.minimized ~ .menu-toggle i::before {
+            content: '\f067';
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--card) 0%, #f0fdf4 100%);
+            padding: 30px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+        .header h1 {
+            color: var(--primary-dark);
+            font-size: 1.8rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+        .header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        .calculator-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .calc-card {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 30px;
+            box-shadow: var(--shadow);
+            transition: all 0.3s ease;
+            border: 1px solid var(--border);
+        }
+        .calc-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+        .calc-card h2 {
+            color: var(--primary-dark);
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.3rem;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(22, 163, 74, 0.1);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text);
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: #fafafa;
+            font-family: inherit;
+        }
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+        }
+        .form-group input::placeholder {
+            color: #9ca3af;
+        }
+
+        .harga-hint {
+            font-size: 0.85rem;
+            color: var(--primary);
+            margin-top: 8px;
+            display: none;
+            padding: 8px 12px;
+            background: rgba(22, 163, 74, 0.1);
+            border-radius: 8px;
+        }
+
+        .btn-calculate {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.05rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 14px rgba(22, 163, 74, 0.3);
+        }
+        .btn-calculate:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(22, 163, 74, 0.4);
+        }
+        .btn-calculate:active {
+            transform: translateY(-1px);
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+            color: white;
+            padding: 25px;
+            border-radius: var(--radius);
+            margin-top: 25px;
+            animation: slideUp 0.4s ease;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .result-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 12px;
+            opacity: 0.95;
+            font-weight: 600;
+        }
+        .result-value {
+            font-size: 2.8rem;
+            font-weight: 800;
+            margin-bottom: 8px;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+        }
+        .result-detail {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+        }
+        .detail-item {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        .detail-item small {
+            opacity: 0.9;
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .detail-item strong {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .tips-box {
+            background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
+            border-left: 4px solid var(--accent);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+        }
+        .tips-box h4 {
+            color: #c2410c;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 1rem;
+        }
+        .tips-box ul {
+            margin-left: 20px;
+            color: #78350f;
+        }
+        .tips-box li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .result-box.pupuk {
+            background: linear-gradient(135deg, #ec4899 0%, #f43f5e 100%);
+        }
+
         @media (max-width: 1024px) {
-            .sidebar { transform: translateX(-100%); }
-            .main-content { margin-left: 0; }
-            .calculator-container { grid-template-columns: 1fr; }
+            .calculator-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            .main-content {
+                margin-left: 0;
+            }
+            .menu-toggle {
+                left: 20px;
+            }
+            .sidebar.minimized ~ .menu-toggle {
+                left: 20px;
+            }
         }
     </style>
 </head>
 <body>
     <%- include('partials/sidebar', { active: 'kalkulator-tani' }) %>
+    
+    <button class="menu-toggle" onclick="toggleSidebar()" title="Toggle Menu">
+        <i class="fas fa-bars"></i>
+    </button>
 
     <main class="main-content">
         <div class="header">
             <h1><i class="fas fa-calculator"></i> Kalkulator Tani</h1>
-            <p>Hitung estimasi biaya, keuntungan, dan analisis finansial pertanian Anda</p>
+            <p>Hitung estimasi biaya, keuntungan, dan analisis finansial pertanian Anda dengan akurat</p>
         </div>
 
         <div class="calculator-container">
             <div class="calc-card">
                 <h2><i class="fas fa-money-bill-wave"></i> Kalkulator Keuntungan</h2>
                 <div class="form-group">
-                    <label>Jenis Tanaman</label>
+                    <label for="jenisTanaman"><i class="fas fa-seedling"></i> Jenis Tanaman</label>
                     <select id="jenisTanaman" onchange="loadHargaSaran()">
-                        <option value="padi">Padi</option>
-                        <option value="jagung">Jagung</option>
-                        <option value="kedelai">Kedelai</option>
-                        <option value="cabai">Cabai</option>
-                        <option value="bawang">Bawang Merah</option>
+                        <option value="padi">🌾 Padi</option>
+                        <option value="jagung">🌽 Jagung</option>
+                        <option value="kedelai">🫘 Kedelai</option>
+                        <option value="cabai">🌶️ Cabai</option>
+                        <option value="bawang">🧅 Bawang Merah</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Luas Lahan (hektar)</label>
-                    <input type="number" id="luasLahan" placeholder="Contoh: 1.5" step="0.1">
+                    <label for="luasLahan"><i class="fas fa-ruler-combined"></i> Luas Lahan (hektar)</label>
+                    <input type="number" id="luasLahan" placeholder="Contoh: 1.5" step="0.1" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Biaya Bibit (Rp)</label>
-                    <input type="number" id="biayaBibit" placeholder="Contoh: 2500000">
+                    <label for="biayaBibit"><i class="fas fa-seedling"></i> Biaya Bibit (Rp)</label>
+                    <input type="number" id="biayaBibit" placeholder="Contoh: 2500000" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Biaya Pupuk & Pestisida (Rp)</label>
-                    <input type="number" id="biayaPupuk" placeholder="Contoh: 1500000">
+                    <label for="biayaPupuk"><i class="fas fa-flask"></i> Biaya Pupuk & Pestisida (Rp)</label>
+                    <input type="number" id="biayaPupuk" placeholder="Contoh: 1500000" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Biaya Tenaga Kerja (Rp)</label>
-                    <input type="number" id="biayaTenaga" placeholder="Contoh: 2000000">
+                    <label for="biayaTenaga"><i class="fas fa-users"></i> Biaya Tenaga Kerja (Rp)</label>
+                    <input type="number" id="biayaTenaga" placeholder="Contoh: 2000000" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Estimasi Hasil Panen (kg)</label>
-                    <input type="number" id="estimasiHasil" placeholder="Contoh: 5000">
+                    <label for="estimasiHasil"><i class="fas fa-wheat-awn"></i> Estimasi Hasil Panen (kg)</label>
+                    <input type="number" id="estimasiHasil" placeholder="Contoh: 5000" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Harga Jual per kg (Rp)</label>
-                    <input type="number" id="hargaJual" placeholder="Contoh: 6000">
+                    <label for="hargaJual"><i class="fas fa-tag"></i> Harga Jual per kg (Rp)</label>
+                    <input type="number" id="hargaJual" placeholder="Contoh: 6000" min="0">
                     <div class="harga-hint" id="hargaHint">
-                        <i class="fas fa-info-circle"></i> Harga pasar saat ini: <span id="hargaPasar">—</span>
+                        <i class="fas fa-info-circle"></i> Harga pasar saat ini: <strong id="hargaPasar">—</strong>
                     </div>
                 </div>
                 <button class="btn-calculate" onclick="hitungKeuntungan()">
@@ -104,13 +427,25 @@
                 </button>
                 <div id="hasilKeuntungan" style="display: none;">
                     <div class="result-box">
-                        <h3>Estimasi Keuntungan Bersih</h3>
+                        <h3>📊 Estimasi Keuntungan Bersih</h3>
                         <div class="result-value" id="profitValue">Rp 0</div>
                         <div class="result-detail">
-                            <div class="detail-item"><small>Total Pendapatan</small><strong id="totalPendapatan">Rp 0</strong></div>
-                            <div class="detail-item"><small>Total Biaya</small><strong id="totalBiaya">Rp 0</strong></div>
-                            <div class="detail-item"><small>ROI</small><strong id="roiValue">0%</strong></div>
-                            <div class="detail-item"><small>Keuntungan/kg</small><strong id="profitPerKg">Rp 0</strong></div>
+                            <div class="detail-item">
+                                <small>💰 Total Pendapatan</small>
+                                <strong id="totalPendapatan">Rp 0</strong>
+                            </div>
+                            <div class="detail-item">
+                                <small>💸 Total Biaya</small>
+                                <strong id="totalBiaya">Rp 0</strong>
+                            </div>
+                            <div class="detail-item">
+                                <small>📈 ROI</small>
+                                <strong id="roiValue">0%</strong>
+                            </div>
+                            <div class="detail-item">
+                                <small>💵 Keuntungan/kg</small>
+                                <strong id="profitPerKg">Rp 0</strong>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -119,48 +454,60 @@
             <div class="calc-card">
                 <h2><i class="fas fa-flask"></i> Kalkulator Pupuk</h2>
                 <div class="form-group">
-                    <label>Luas Lahan (m²)</label>
-                    <input type="number" id="luasPupuk" placeholder="Contoh: 10000">
+                    <label for="luasPupuk"><i class="fas fa-ruler-combined"></i> Luas Lahan (m²)</label>
+                    <input type="number" id="luasPupuk" placeholder="Contoh: 10000" min="0">
                 </div>
                 <div class="form-group">
-                    <label>Jenis Tanaman</label>
+                    <label for="jenisTanamanPupuk"><i class="fas fa-seedling"></i> Jenis Tanaman</label>
                     <select id="jenisTanamanPupuk">
-                        <option value="padi">Padi (NPK 15-15-15)</option>
-                        <option value="jagung">Jagung (Urea + SP-36)</option>
-                        <option value="kedelai">Kedelai (NPK 12-12-12)</option>
-                        <option value="sayuran">Sayuran (NPK 16-16-16)</option>
+                        <option value="padi">🌾 Padi (NPK 15-15-15)</option>
+                        <option value="jagung">🌽 Jagung (Urea + SP-36)</option>
+                        <option value="kedelai">🫘 Kedelai (NPK 12-12-12)</option>
+                        <option value="sayuran">🥬 Sayuran (NPK 16-16-16)</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label>Kondisi Tanah</label>
+                    <label for="kondisiTanah"><i class="fas fa-layer-group"></i> Kondisi Tanah</label>
                     <select id="kondisiTanah">
-                        <option value="subur">Subur</option>
-                        <option value="sedang">Sedang</option>
-                        <option value="kurang">Kurang Subur</option>
+                        <option value="subur">🟢 Subur</option>
+                        <option value="sedang">🟡 Sedang</option>
+                        <option value="kurang">🔴 Kurang Subur</option>
                     </select>
                 </div>
                 <button class="btn-calculate" onclick="hitungPupuk()">
                     <i class="fas fa-flask"></i> Hitung Kebutuhan Pupuk
                 </button>
                 <div id="hasilPupuk" style="display: none;">
-                    <div class="result-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
-                        <h3>Kebutuhan Pupuk</h3>
+                    <div class="result-box pupuk">
+                        <h3>🧪 Kebutuhan Pupuk</h3>
                         <div class="result-value" id="totalPupuk">0 kg</div>
                         <div class="result-detail">
-                            <div class="detail-item"><small>Pupuk Dasar</small><strong id="pupukDasar">0 kg</strong></div>
-                            <div class="detail-item"><small>Pupuk Tambahan</small><strong id="pupukTambahan">0 kg</strong></div>
-                            <div class="detail-item"><small>Estimasi Biaya</small><strong id="biayaPupukTotal">Rp 0</strong></div>
-                            <div class="detail-item"><small>Waktu Pemupukan</small><strong id="waktuPemupukan">-</strong></div>
+                            <div class="detail-item">
+                                <small>📦 Pupuk Dasar</small>
+                                <strong id="pupukDasar">0 kg</strong>
+                            </div>
+                            <div class="detail-item">
+                                <small>➕ Pupuk Tambahan</small>
+                                <strong id="pupukTambahan">0 kg</strong>
+                            </div>
+                            <div class="detail-item">
+                                <small>💰 Estimasi Biaya</small>
+                                <strong id="biayaPupukTotal">Rp 0</strong>
+                            </div>
+                            <div class="detail-item">
+                                <small>⏰ Waktu Pemupukan</small>
+                                <strong id="waktuPemupukan">-</strong>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="tips-box">
-                    <h4><i class="fas fa-lightbulb"></i> Tips Penggunaan</h4>
+                    <h4><i class="fas fa-lightbulb"></i> Tips Penggunaan Pupuk</h4>
                     <ul>
-                        <li>Gunakan pupuk sesuai dosis untuk efisiensi</li>
-                        <li>Pemupukan pagi atau sore hari lebih baik</li>
-                        <li>Perhatikan kondisi cuaca saat pemupukan</li>
-                        <li>Gunakan pupuk organik untuk kesuburan jangka panjang</li>
+                        <li>Gunakan pupuk sesuai dosis untuk efisiensi maksimal</li>
+                        <li>Pemupukan pagi (06:00-09:00) atau sore (16:00-18:00) lebih efektif</li>
+                        <li>Perhatikan kondisi cuaca - hindari pemupukan saat hujan</li>
+                        <li>Kombinasikan dengan pupuk organik untuk kesuburan jangka panjang</li>
                     </ul>
                 </div>
             </div>
@@ -168,6 +515,11 @@
     </main>
 
     <script>
+        // Sidebar toggle
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('minimized');
+        }
+
         // Map nama komoditas ke data API
         const komoditasMap = {
             padi: ['beras', 'padi'],
@@ -185,12 +537,11 @@
                 const res  = await fetch('/api/harga/terkini');
                 const json = await res.json();
                 if (json.sukses && json.data && json.data.length) {
-                    // Cari harga yang sesuai dengan jenis tanaman
                     const keywords = komoditasMap[jenis] || [jenis];
-                    const matchedData = json.data.find(h => 
+                    const matchedData = json.data.find(h =>
                         keywords.some(k => h.nama.toLowerCase().includes(k))
                     );
-                    
+
                     if (matchedData) {
                         const h = matchedData;
                         nilaiEl.textContent = `Rp ${Number(h.harga).toLocaleString('id-ID')}/${h.satuan}`;
@@ -201,11 +552,15 @@
                 } else {
                     hintEl.style.display = 'none';
                 }
-            } catch { hintEl.style.display = 'none'; }
+            } catch { 
+                hintEl.style.display = 'none'; 
+            }
         }
 
         function formatRupiah(angka) {
-            return 'Rp ' + Math.round(angka).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            if (isNaN(angka)) return 'Rp 0';
+            const formatted = Math.round(angka).toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            return 'Rp ' + formatted;
         }
 
         function hitungKeuntungan() {
@@ -214,23 +569,29 @@
             const tenaga   = parseFloat(document.getElementById('biayaTenaga').value)  || 0;
             const hasil    = parseFloat(document.getElementById('estimasiHasil').value)|| 0;
             const harga    = parseFloat(document.getElementById('hargaJual').value)    || 0;
+            
             const totalBiaya      = bibit + pupuk + tenaga;
             const totalPendapatan = hasil * harga;
             const keuntungan      = totalPendapatan - totalBiaya;
             const roi             = totalBiaya > 0 ? ((keuntungan / totalBiaya) * 100).toFixed(2) : 0;
             const profitPerKg     = hasil > 0 ? keuntungan / hasil : 0;
+            
             document.getElementById('totalPendapatan').textContent = formatRupiah(totalPendapatan);
             document.getElementById('totalBiaya').textContent      = formatRupiah(totalBiaya);
             document.getElementById('profitValue').textContent     = formatRupiah(keuntungan);
             document.getElementById('roiValue').textContent        = roi + '%';
             document.getElementById('profitPerKg').textContent     = formatRupiah(profitPerKg);
-            document.getElementById('hasilKeuntungan').style.display = 'block';
+            
+            const resultDiv = document.getElementById('hasilKeuntungan');
+            resultDiv.style.display = 'block';
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         function hitungPupuk() {
             const luas   = parseFloat(document.getElementById('luasPupuk').value) || 0;
             const jenis  = document.getElementById('jenisTanamanPupuk').value;
             const kondisi= document.getElementById('kondisiTanah').value;
+            
             let dosisPerMeter = 0, hargaPerKg = 0, waktu = '';
             switch(jenis) {
                 case 'padi':    dosisPerMeter=0.3; hargaPerKg=12000; waktu='3x: 7, 21, 35 HST'; break;
@@ -238,16 +599,21 @@
                 case 'kedelai': dosisPerMeter=0.2; hargaPerKg=11000; waktu='2x: 10, 25 HST';    break;
                 case 'sayuran': dosisPerMeter=0.4; hargaPerKg=15000; waktu='2 minggu sekali';   break;
             }
+            
             let mult = kondisi === 'subur' ? 0.8 : kondisi === 'kurang' ? 1.3 : 1;
             const total   = Math.ceil(luas * dosisPerMeter * mult);
             const dasar   = Math.ceil(total * 0.6);
             const tambahan= Math.ceil(total * 0.4);
+            
             document.getElementById('totalPupuk').textContent      = total + ' kg';
             document.getElementById('pupukDasar').textContent      = dasar + ' kg';
             document.getElementById('pupukTambahan').textContent   = tambahan + ' kg';
             document.getElementById('biayaPupukTotal').textContent = formatRupiah(total * hargaPerKg);
             document.getElementById('waktuPemupukan').textContent  = waktu;
-            document.getElementById('hasilPupuk').style.display = 'block';
+            
+            const resultDiv = document.getElementById('hasilPupuk');
+            resultDiv.style.display = 'block';
+            resultDiv.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         }
 
         // Load harga saran untuk tanaman default saat halaman dibuka

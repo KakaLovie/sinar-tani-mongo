@@ -23,37 +23,46 @@ const PORT = process.env.PORT || 3000;
 
 // ── Security ──────────────────────────────────────────────────────────────────
 app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc : ["'self'","'unsafe-inline'","cdn.jsdelivr.net","unpkg.com","cdnjs.cloudflare.com"],
-            styleSrc  : ["'self'","'unsafe-inline'","cdn.jsdelivr.net","fonts.googleapis.com","cdnjs.cloudflare.com","unpkg.com"],
-            fontSrc   : ["'self'","fonts.gstatic.com","cdnjs.cloudflare.com"],
-            imgSrc    : ["'self'","data:","https:","*.tile.openstreetmap.org","*.basemaps.cartocdn.com"],
-            connectSrc: ["'self'","panelharga.badanpangan.go.id"],
-        }
-    }
+    contentSecurityPolicy: false, // Disable for development, enable in production with proper config
+    crossOriginEmbedderPolicy: false
 }));
-app.use(cors({ origin: process.env.NODE_ENV === 'production' ? process.env.ALLOWED_ORIGIN : '*', credentials: true }));
+app.use(cors({ 
+    origin: process.env.NODE_ENV === 'production' ? process.env.ALLOWED_ORIGIN : '*', 
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 // ── Rate Limiting ─────────────────────────────────────────────────────────────
-const apiLimiter  = rateLimit({ windowMs: 15*60*1000, max: 300, standardHeaders: true, legacyHeaders: false });
-const authLimiter = rateLimit({ windowMs: 15*60*1000, max: 20 });
+const apiLimiter  = rateLimit({ windowMs: 15*60*1000, max: 300, standardHeaders: true, legacyHeaders: false, message: { sukses: false, pesan: 'Terlalu banyak permintaan, coba lagi nanti.' } });
+const authLimiter = rateLimit({ windowMs: 15*60*1000, max: 20, standardHeaders: true, legacyHeaders: false, message: { sukses: false, pesan: 'Terlalu banyak percobaan login, coba lagi nanti.' } });
 
 // ── Middleware ─────────────────────────────────────────────────────────────────
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(express.json({ limit: '10mb' }));
+
+// Cookie parser with better error handling
+app.use((err, req, res, next) => {
+    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
+        console.error('[Cookie Parse Error]', err);
+        return res.status(400).json({ sukses: false, pesan: 'Invalid request format.' });
+    }
+    next();
+});
+
 app.use(cookieParser());
 app.use(methodOvr('_method'));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+app.set('trust proxy', 1); // Trust first proxy
 
 // ── Global template vars ───────────────────────────────────────────────────────
 app.use(optionalAuth);
 app.use((req, res, next) => {
     res.locals.appName = 'Sinar Tani';
     res.locals.tahun   = new Date().getFullYear();
+    res.locals.user    = req.user || null;
     next();
 });
 
@@ -74,7 +83,8 @@ app.get('/profil', requireAuth, async (req, res) => {
     try {
         const user = await User.findById(req.user.id).select('-password');
         res.render('profil', { profileUser: user });
-    } catch {
+    } catch (err) {
+        console.error('[Profil Error]', err);
         res.redirect('/dashboard');
     }
 });
@@ -101,7 +111,7 @@ app.get('/admin', requireAuth, requireRole('admin'), async (req, res) => {
             recentUsers, recentHama
         });
     } catch (err) {
-        console.error(err);
+        console.error('[Admin Error]', err);
         res.render('error', { message: 'Gagal memuat panel admin.' });
     }
 });
@@ -111,8 +121,18 @@ app.use((req, res) => {
     if (req.path.startsWith('/api/')) return res.status(404).json({ sukses: false, pesan: 'Endpoint tidak ditemukan.' });
     res.status(404).render('error', { message: 'Halaman tidak ditemukan.' });
 });
+
 app.use((err, req, res, next) => {
     console.error('[ERROR]', err.stack);
+    
+    // Handle specific error types
+    if (err.name === 'JsonWebTokenError') {
+        return res.status(401).json({ sukses: false, pesan: 'Token tidak valid.' });
+    }
+    if (err.name === 'ValidationError') {
+        return res.status(400).json({ sukses: false, pesan: err.message });
+    }
+    
     const msg = process.env.NODE_ENV === 'production' ? 'Terjadi kesalahan server.' : err.message;
     if (req.path.startsWith('/api/')) return res.status(err.status||500).json({ sukses: false, pesan: msg });
     res.status(err.status||500).render('error', { message: msg });
@@ -133,7 +153,10 @@ async function start() {
     });
 }
 
-start().catch(console.error);
+start().catch(err => {
+    console.error('[Startup Error]', err);
+    process.exit(1);
+});
 
 // Export untuk Vercel
 module.exports = app;

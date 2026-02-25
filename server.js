@@ -153,10 +153,13 @@ async function start() {
     });
 }
 
-start().catch(err => {
-    console.error('[Startup Error]', err);
-    process.exit(1);
-});
+// Start server only if running directly (not imported by Vercel)
+if (require.main === module) {
+    start().catch(err => {
+        console.error('[Startup Error]', err);
+        process.exit(1);
+    });
+}
 
 // Export untuk Vercel
 module.exports = app;

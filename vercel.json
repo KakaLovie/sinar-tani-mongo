@@ -14,10 +14,21 @@
   ],
   "functions": {
     "api/index.js": {
-      "maxDuration": 30
+      "maxDuration": 30,
+      "memory": 1024
     }
   },
   "env": {
-    "NODE_ENV": "production"
+    "NODE_ENV": "production",
+    "MONGODB_URI": "@mongodb_uri",
+    "JWT_SECRET": "@jwt_secret"
+  },
+  "cookies": {
+    "token": {
+      "path": "/",
+      "secure": true,
+      "httpOnly": true,
+      "sameSite": "lax"
+    }
   }
 }

@@ -23,39 +23,73 @@ const PORT = process.env.PORT || 3000;
 
 // ── Security ──────────────────────────────────────────────────────────────────
 app.use(helmet({
-    contentSecurityPolicy: false, // Disable for development, enable in production with proper config
-    crossOriginEmbedderPolicy: false
+    contentSecurityPolicy: false,
+    crossOriginEmbedderPolicy: false,
+    frameguard: false
 }));
-app.use(cors({ 
-    origin: process.env.NODE_ENV === 'production' ? process.env.ALLOWED_ORIGIN : '*', 
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // Allow all origins in development, restrict in production
+        if (process.env.NODE_ENV === 'production') {
+            if (!origin || origin.includes('vercel.app') || origin.includes('yourdomain.com')) {
+                callback(null, true);
+            } else {
+                callback(new Error('Not allowed by CORS'));
+            }
+        } else {
+            callback(null, true);
+        }
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    allowedHeaders: ['Content-Type', 'Authorization', 'Cookie']
 }));
 
+// Trust proxy for proper IP detection behind Vercel
+app.set('trust proxy', 1);
+
 // ── Rate Limiting ─────────────────────────────────────────────────────────────
-const apiLimiter  = rateLimit({ windowMs: 15*60*1000, max: 300, standardHeaders: true, legacyHeaders: false, message: { sukses: false, pesan: 'Terlalu banyak permintaan, coba lagi nanti.' } });
-const authLimiter = rateLimit({ windowMs: 15*60*1000, max: 20, standardHeaders: true, legacyHeaders: false, message: { sukses: false, pesan: 'Terlalu banyak percobaan login, coba lagi nanti.' } });
-
-// ── Middleware ─────────────────────────────────────────────────────────────────
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(express.json({ limit: '10mb' }));
-
-// Cookie parser with better error handling
-app.use((err, req, res, next) => {
-    if (err instanceof SyntaxError && err.status === 400 && 'body' in err) {
-        console.error('[Cookie Parse Error]', err);
-        return res.status(400).json({ sukses: false, pesan: 'Invalid request format.' });
-    }
-    next();
+const apiLimiter  = rateLimit({ 
+    windowMs: 15*60*1000, 
+    max: 300, 
+    standardHeaders: true, 
+    legacyHeaders: false,
+    message: { sukses: false, pesan: 'Terlalu banyak permintaan, coba lagi nanti.' }
 });
 
+const authLimiter = rateLimit({ 
+    windowMs: 15*60*1000, 
+    max: 50, // Increased from 20 to prevent false positives
+    standardHeaders: true, 
+    legacyHeaders: false,
+    message: { sukses: false, pesan: 'Terlalu banyak percobaan, coba lagi nanti.' }
+});
+
+// ── Middleware (order matters!) ───────────────────────────────────────────────
+
+// Parse JSON first
+app.use(express.json({ limit: '10mb' }));
+
+// Parse URL-encoded bodies
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+// Cookie parser (must be after express.json/urlencoded)
 app.use(cookieParser());
+
+// Method override
 app.use(methodOvr('_method'));
-app.use(express.static(path.join(__dirname, 'public'), { maxAge: '1d' }));
+
+// Static files with caching
+app.use(express.static(path.join(__dirname, 'public'), { 
+    maxAge: process.env.NODE_ENV === 'production' ? '1d' : '0s',
+    etag: true,
+    lastModified: true
+}));
+
+// View engine
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-app.set('trust proxy', 1); // Trust first proxy
 
 // ── Global template vars ───────────────────────────────────────────────────────
 app.use(optionalAuth);
@@ -72,7 +106,12 @@ app.use('/api',  apiLimiter,  apiRoutes);
 
 // ── Page Routes ────────────────────────────────────────────────────────────────
 app.get('/', (req, res) => res.render('landing'));
-app.get('/dashboard', (req, res) => res.render('dashboard'));
+
+app.get('/dashboard', async (req, res) => {
+    // Don't require auth - show public dashboard with CTA to login
+    res.render('dashboard');
+});
+
 app.get('/kalkulator-tani', (req, res) => res.render('kalkulator-tani'));
 app.get('/k-map', (req, res) => res.render('k-map'));
 app.get('/pasar-tani', (req, res) => res.render('pasar-tani'));
@@ -118,13 +157,15 @@ app.get('/admin', requireAuth, requireRole('admin'), async (req, res) => {
 
 // ── 404 & Error handlers ───────────────────────────────────────────────────────
 app.use((req, res) => {
-    if (req.path.startsWith('/api/')) return res.status(404).json({ sukses: false, pesan: 'Endpoint tidak ditemukan.' });
+    if (req.path.startsWith('/api/')) {
+        return res.status(404).json({ sukses: false, pesan: 'Endpoint tidak ditemukan.' });
+    }
     res.status(404).render('error', { message: 'Halaman tidak ditemukan.' });
 });
 
 app.use((err, req, res, next) => {
     console.error('[ERROR]', err.stack);
-    
+
     // Handle specific error types
     if (err.name === 'JsonWebTokenError') {
         return res.status(401).json({ sukses: false, pesan: 'Token tidak valid.' });
@@ -132,9 +173,17 @@ app.use((err, req, res, next) => {
     if (err.name === 'ValidationError') {
         return res.status(400).json({ sukses: false, pesan: err.message });
     }
+    if (err.name === 'MongoServerError') {
+        return res.status(500).json({ sukses: false, pesan: 'Database error. Silakan coba lagi.' });
+    }
+
+    const msg = process.env.NODE_ENV === 'production' 
+        ? 'Terjadi kesalahan server.' 
+        : err.message;
     
-    const msg = process.env.NODE_ENV === 'production' ? 'Terjadi kesalahan server.' : err.message;
-    if (req.path.startsWith('/api/')) return res.status(err.status||500).json({ sukses: false, pesan: msg });
+    if (req.path.startsWith('/api/')) {
+        return res.status(err.status||500).json({ sukses: false, pesan: msg });
+    }
     res.status(err.status||500).render('error', { message: msg });
 });
 
@@ -144,11 +193,12 @@ async function start() {
     app.listen(PORT, () => {
         console.log(`
 ╔══════════════════════════════════════════════╗
-║           🌾  SINAR TANI v2.0  🌾           ║
+║           🌾  SINAR TANI v2.1  🌾           ║
 ║   Platform Digital Rantai Pasok Pertanian    ║
 ╠══════════════════════════════════════════════╣
 ║  🚀  Server  : http://localhost:${PORT}         ║
 ║  🗄️  Database: MongoDB                       ║
+║  ✨  Mode    : ${process.env.NODE_ENV || 'development'}                       ║
 ╚══════════════════════════════════════════════╝`);
     });
 }

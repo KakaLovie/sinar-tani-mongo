@@ -1,83 +1,480 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Masuk — Sinar Tani</title>
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box;}
-body{font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex;background:#f0f4f0;}
-.left{width:380px;flex-shrink:0;background:linear-gradient(160deg,#1e3d1a,#2d5a27,#3a7a32);padding:48px 40px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;}
-.left::before{content:'';position:absolute;top:-80px;right:-80px;width:280px;height:280px;border-radius:50%;background:rgba(76,175,80,.12);}
-.left::after{content:'';position:absolute;bottom:-60px;left:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.05);}
-.left-content{position:relative;z-index:1;}
-.left-logo i{font-size:3rem;color:#81c784;display:block;margin-bottom:14px;}
-.left-logo h1{font-size:2rem;color:#fff;font-weight:700;margin-bottom:8px;}
-.left-logo p{color:rgba(255,255,255,.7);font-size:.95rem;line-height:1.6;margin-bottom:36px;}
-.feature{display:flex;align-items:center;gap:12px;margin-bottom:16px;color:rgba(255,255,255,.85);font-size:.9rem;}
-.feature i{width:32px;height:32px;background:rgba(255,255,255,.1);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.right{flex:1;display:flex;align-items:center;justify-content:center;padding:32px 24px;}
-.box{width:100%;max-width:420px;}
-.box h2{font-size:1.6rem;font-weight:700;color:#1e3d1a;margin-bottom:4px;}
-.box p{color:#888;font-size:.9rem;margin-bottom:28px;}
-.box p a{color:#2d5a27;font-weight:600;text-decoration:none;}
-.err{background:#fee2e2;border-left:4px solid #ef4444;padding:12px 16px;border-radius:10px;color:#991b1b;font-size:.88rem;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
-.fg{margin-bottom:16px;}
-.fg label{display:block;margin-bottom:6px;font-size:.84rem;font-weight:600;color:#444;}
-.iw{position:relative;}
-.iw i{position:absolute;left:13px;top:50%;transform:translateY(-50%);color:#aaa;font-size:.9rem;pointer-events:none;}
-.iw input{width:100%;padding:11px 13px 11px 38px;border:2px solid #e5e7eb;border-radius:10px;font-size:.93rem;font-family:inherit;transition:all .2s;background:#fafafa;}
-.iw input:focus{outline:none;border-color:#4CAF50;background:#fff;box-shadow:0 0 0 3px rgba(76,175,80,.12);}
-.btn{width:100%;padding:14px;background:linear-gradient(135deg,#2d5a27,#4CAF50);color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;transition:all .3s;margin-top:4px;}
-.btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(45,90,39,.35);}
-.back{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:16px;padding:11px;border:2px solid #e5e7eb;border-radius:12px;color:#666;text-decoration:none;font-size:.9rem;transition:all .3s;}
-.back:hover{border-color:#4CAF50;color:#2d5a27;}
-.demo-box{margin-top:20px;padding:14px;background:#f0fdf0;border:1px solid #bbf7d0;border-radius:12px;}
-.demo-box h4{font-size:.82rem;font-weight:700;color:#166534;margin-bottom:8px;}
-.demo-item{font-size:.78rem;color:#15803d;margin-bottom:4px;font-family:monospace;}
-@media(max-width:800px){.left{display:none;}.right{padding:24px 16px;}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Masuk - Sinar Tani</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="/css/premium.css">
+    <style>
+        .auth-page {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            background: var(--slate-50);
+        }
+
+        .auth-left {
+            background: var(--gradient-primary);
+            padding: var(--space-16);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .auth-left::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .auth-left::after {
+            content: '';
+            position: absolute;
+            bottom: -30%;
+            left: -10%;
+            width: 400px;
+            height: 400px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 50%;
+        }
+
+        .auth-brand {
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-brand-logo {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-8);
+        }
+
+        .auth-brand-logo-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: var(--radius-lg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .auth-brand h1 {
+            font-size: 1.75rem;
+            color: white;
+            font-weight: 800;
+        }
+
+        .auth-features {
+            position: relative;
+            z-index: 1;
+        }
+
+        .auth-feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-4);
+            margin-bottom: var(--space-5);
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .auth-feature-icon {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.1rem;
+        }
+
+        .auth-feature-text h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: var(--space-1);
+        }
+
+        .auth-feature-text p {
+            font-size: 0.875rem;
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.5;
+        }
+
+        .auth-right {
+            padding: var(--space-16);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: white;
+        }
+
+        .auth-box {
+            width: 100%;
+            max-width: 440px;
+        }
+
+        .auth-header {
+            margin-bottom: var(--space-10);
+        }
+
+        .auth-header h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--slate-900);
+            margin-bottom: var(--space-2);
+        }
+
+        .auth-header p {
+            color: var(--slate-600);
+            font-size: 1rem;
+        }
+
+        .auth-header a {
+            color: var(--primary-600);
+            font-weight: 600;
+        }
+
+        .auth-header a:hover {
+            color: var(--primary-700);
+            text-decoration: underline;
+        }
+
+        .auth-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-left: 4px solid var(--accent-red);
+            padding: var(--space-4);
+            border-radius: var(--radius-lg);
+            margin-bottom: var(--space-6);
+            display: flex;
+            align-items: flex-start;
+            gap: var(--space-3);
+        }
+
+        .auth-error-icon {
+            color: var(--accent-red);
+            font-size: 1.25rem;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .auth-error-text {
+            color: #991b1b;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .auth-form {
+            margin-bottom: var(--space-6);
+        }
+
+        .auth-input-group {
+            margin-bottom: var(--space-5);
+        }
+
+        .auth-label {
+            display: block;
+            margin-bottom: var(--space-2);
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--slate-700);
+        }
+
+        .auth-input-wrapper {
+            position: relative;
+        }
+
+        .auth-input-icon {
+            position: absolute;
+            left: var(--space-4);
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--slate-400);
+            font-size: 1rem;
+            pointer-events: none;
+            transition: color var(--transition-fast);
+        }
+
+        .auth-input {
+            width: 100%;
+            padding: var(--space-3) var(--space-4);
+            padding-left: var(--space-12);
+            font-size: 0.95rem;
+            font-family: var(--font-sans);
+            border: 2px solid var(--slate-200);
+            border-radius: var(--radius-lg);
+            background: white;
+            transition: all var(--transition-fast);
+        }
+
+        .auth-input:focus {
+            outline: none;
+            border-color: var(--primary-500);
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+        }
+
+        .auth-input:focus + .auth-input-icon {
+            color: var(--primary-600);
+        }
+
+        .auth-submit {
+            width: 100%;
+            padding: var(--space-4);
+            background: var(--gradient-primary);
+            color: white;
+            border: none;
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all var(--transition-base);
+            box-shadow: var(--shadow-md), 0 0 0 0 rgba(22, 163, 74, 0.4);
+        }
+
+        .auth-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-xl), 0 0 0 4px rgba(22, 163, 74, 0.15);
+        }
+
+        .auth-submit:active {
+            transform: translateY(0);
+        }
+
+        .auth-back {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-2);
+            color: var(--slate-600);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: color var(--transition-fast);
+            margin-top: var(--space-6);
+        }
+
+        .auth-back:hover {
+            color: var(--primary-600);
+        }
+
+        .auth-back i {
+            transition: transform var(--transition-fast);
+        }
+
+        .auth-back:hover i {
+            transform: translateX(-4px);
+        }
+
+        .demo-box {
+            margin-top: var(--space-8);
+            padding: var(--space-5);
+            background: linear-gradient(135deg, var(--primary-50), var(--primary-100));
+            border: 1px solid var(--primary-200);
+            border-radius: var(--radius-xl);
+        }
+
+        .demo-box h4 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            color: var(--primary-800);
+            margin-bottom: var(--space-3);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+
+        .demo-credentials {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-2);
+        }
+
+        .demo-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: 0.8rem;
+            color: var(--primary-700);
+            font-family: var(--font-mono);
+            padding: var(--space-2) var(--space-3);
+            background: rgba(255, 255, 255, 0.6);
+            border-radius: var(--radius-md);
+        }
+
+        .demo-item strong {
+            font-weight: 700;
+        }
+
+        @media (max-width: 1024px) {
+            .auth-page {
+                grid-template-columns: 1fr;
+            }
+
+            .auth-left {
+                display: none;
+            }
+
+            .auth-right {
+                padding: var(--space-10);
+            }
+        }
+    </style>
 </head>
 <body>
-<div class="left">
-  <div class="left-content">
-    <div class="left-logo">
-      <i class="fas fa-seedling"></i>
-      <h1>SINAR TANI</h1>
-      <p>Platform digital untuk memperkuat rantai pasok pertanian Indonesia dari hulu ke hilir.</p>
+    <div class="auth-page">
+        <div class="auth-left">
+            <div class="auth-brand">
+                <div class="auth-brand-logo">
+                    <div class="auth-brand-logo-icon">
+                        <i class="fas fa-seedling"></i>
+                    </div>
+                    <h1>SINAR TANI</h1>
+                </div>
+                <p style="color: rgba(255,255,255,0.8); font-size: 1.1rem; line-height: 1.6; max-width: 400px;">
+                    Platform digital untuk memperkuat rantai pasok pertanian Indonesia dari hulu ke hilir.
+                </p>
+            </div>
+
+            <div class="auth-features">
+                <div class="auth-feature-item">
+                    <div class="auth-feature-icon">
+                        <i class="fas fa-satellite-dish"></i>
+                    </div>
+                    <div class="auth-feature-text">
+                        <h3>Radar Hama Real-Time</h3>
+                        <p>Pantau serangan hama dengan teknologi GIS modern</p>
+                    </div>
+                </div>
+
+                <div class="auth-feature-item">
+                    <div class="auth-feature-icon">
+                        <i class="fas fa-store"></i>
+                    </div>
+                    <div class="auth-feature-text">
+                        <h3>Pasar Tani Digital</h3>
+                        <p>Jual hasil pertanian langsung tanpa perantara</p>
+                    </div>
+                </div>
+
+                <div class="auth-feature-item">
+                    <div class="auth-feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="auth-feature-text">
+                        <h3>Kalkulator Profitabilitas</h3>
+                        <p>Hitung keuntungan dan analisis finansial</p>
+                    </div>
+                </div>
+
+                <div class="auth-feature-item">
+                    <div class="auth-feature-icon">
+                        <i class="fas fa-hands-helping"></i>
+                    </div>
+                    <div class="auth-feature-text">
+                        <h3>Bantuan Pemerintah</h3>
+                        <p>Akses program bantuan dari dinas pertanian</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="auth-right">
+            <div class="auth-box">
+                <div class="auth-header">
+                    <h2>Selamat Datang</h2>
+                    <p>Belum punya akun? <a href="/auth/register">Daftar gratis</a></p>
+                </div>
+
+                <% if (error) { %>
+                <div class="auth-error">
+                    <i class="fas fa-exclamation-circle auth-error-icon"></i>
+                    <span class="auth-error-text"><%= error %></span>
+                </div>
+                <% } %>
+
+                <form method="POST" action="/auth/login" class="auth-form">
+                    <input type="hidden" name="redirect" value="<%= redirect %>">
+                    
+                    <div class="auth-input-group">
+                        <label class="auth-label" for="email">Email</label>
+                        <div class="auth-input-wrapper">
+                            <input 
+                                type="email" 
+                                id="email" 
+                                name="email" 
+                                class="auth-input" 
+                                placeholder="nama@contoh.com" 
+                                required 
+                                autocomplete="email"
+                            >
+                            <i class="fas fa-envelope auth-input-icon"></i>
+                        </div>
+                    </div>
+
+                    <div class="auth-input-group">
+                        <label class="auth-label" for="password">Password</label>
+                        <div class="auth-input-wrapper">
+                            <input 
+                                type="password" 
+                                id="password" 
+                                name="password" 
+                                class="auth-input" 
+                                placeholder="••••••••" 
+                                required 
+                                autocomplete="current-password"
+                            >
+                            <i class="fas fa-lock auth-input-icon"></i>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="auth-submit">
+                        <i class="fas fa-sign-in-alt"></i>
+                        Masuk ke Dashboard
+                    </button>
+                </form>
+
+                <a href="/" class="auth-back">
+                    <i class="fas fa-arrow-left"></i>
+                    Kembali ke Beranda
+                </a>
+
+                <div class="demo-box">
+                    <h4>
+                        <i class="fas fa-flask"></i>
+                        Akun Demo (untuk testing):
+                    </h4>
+                    <div class="demo-credentials">
+                        <div class="demo-item">
+                            <i class="fas fa-user-shield"></i>
+                            <strong>Admin:</strong> admin@demo.com / admin1234
+                        </div>
+                        <div class="demo-item">
+                            <i class="fas fa-user-check"></i>
+                            <strong>Kader:</strong> kader@demo.com / demo1234
+                        </div>
+                        <div class="demo-item">
+                            <i class="fas fa-user"></i>
+                            <strong>Petani:</strong> petani@demo.com / demo1234
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="feature"><i class="fas fa-satellite-dish"></i> Radar Hama Real-Time</div>
-    <div class="feature"><i class="fas fa-store"></i> Pasar Tani Digital</div>
-    <div class="feature"><i class="fas fa-chart-line"></i> Monitor Harga Komoditas</div>
-    <div class="feature"><i class="fas fa-hands-helping"></i> Program Bantuan Dinas</div>
-    <div class="feature"><i class="fas fa-graduation-cap"></i> Kelas & Pelatihan Tani</div>
-  </div>
-</div>
-<div class="right">
-  <div class="box">
-    <h2>Selamat Datang</h2>
-    <p>Belum punya akun? <a href="/auth/register">Daftar gratis</a></p>
-    <% if (error) { %><div class="err"><i class="fas fa-exclamation-circle"></i><%= error %></div><% } %>
-    <form method="POST" action="/auth/login">
-      <input type="hidden" name="redirect" value="<%= redirect %>">
-      <div class="fg">
-        <label>Email</label>
-        <div class="iw"><i class="fas fa-envelope"></i><input type="email" name="email" placeholder="email@contoh.com" required autocomplete="email"></div>
-      </div>
-      <div class="fg">
-        <label>Password</label>
-        <div class="iw"><i class="fas fa-lock"></i><input type="password" name="password" placeholder="Password kamu" required autocomplete="current-password"></div>
-      </div>
-      <button class="btn" type="submit"><i class="fas fa-sign-in-alt"></i> Masuk</button>
-    </form>
-    <a href="/" class="back"><i class="fas fa-arrow-left"></i> Kembali ke Beranda</a>
-    <div class="demo-box">
-      <h4>🧪 Akun Demo (setelah npm run seed):</h4>
-      <div class="demo-item">admin@demo.com / admin1234</div>
-      <div class="demo-item">kader@demo.com / demo1234</div>
-      <div class="demo-item">petani@demo.com / demo1234</div>
-    </div>
-  </div>
-</div>
 </body>
 </html>

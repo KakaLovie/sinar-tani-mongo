@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Profil — Sinar Tani</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',sans-serif;background:#f0f4f0;color:#333;}
+.mc{margin-left:260px;padding:28px;max-width:1100px;}
+/* Profile header card */
+.ph{background:linear-gradient(135deg,#1e3d1a,#2d5a27);border-radius:20px;padding:36px;color:#fff;margin-bottom:24px;display:flex;align-items:center;gap:28px;position:relative;overflow:hidden;}
+.ph::after{content:'';position:absolute;right:-40px;top:-40px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.06);}
+.pa{width:90px;height:90px;border-radius:50%;background:linear-gradient(135deg,#4CAF50,#81c784);display:flex;align-items:center;justify-content:center;font-size:2.5rem;font-weight:700;color:#fff;flex-shrink:0;border:4px solid rgba(255,255,255,.3);}
+.pi h2{font-size:1.6rem;font-weight:700;margin-bottom:6px;}
+.pi-meta{display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;}
+.pb{padding:4px 14px;border-radius:20px;font-size:.78rem;font-weight:600;background:rgba(255,255,255,.15);}
+.pb.admin{background:rgba(252,211,77,.25);color:#fcd34d;}
+.pb.kader{background:rgba(59,130,246,.25);color:#93c5fd;}
+.pb.petani{background:rgba(76,175,80,.25);color:#86efac;}
+.pb.dinas{background:rgba(168,85,247,.25);color:#d8b4fe;}
+/* Cards */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.card{background:#fff;border-radius:16px;padding:26px;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+.card h3{font-size:1rem;font-weight:700;color:#1e3d1a;margin-bottom:20px;padding-bottom:12px;border-bottom:2px solid #f0fdf0;display:flex;align-items:center;gap:8px;}
+.fi{margin-bottom:16px;}
+.fi label{display:block;font-size:.8rem;font-weight:600;color:#888;margin-bottom:5px;text-transform:uppercase;letter-spacing:.5px;}
+.fi input{width:100%;padding:10px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:.92rem;font-family:inherit;transition:all .2s;background:#fafafa;}
+.fi input:focus{outline:none;border-color:#4CAF50;background:#fff;}
+.fi input:disabled{background:#f9fafb;color:#555;cursor:default;border-color:#f3f4f6;}
+.fi-val{padding:10px 14px;background:#f9fafb;border-radius:10px;font-size:.92rem;color:#333;border:2px solid #f3f4f6;}
+.save-btn{width:100%;padding:12px;background:linear-gradient(135deg,#2d5a27,#4CAF50);color:#fff;border:none;border-radius:12px;font-size:.95rem;font-weight:700;cursor:pointer;transition:all .3s;}
+.save-btn:hover{transform:translateY(-2px);box-shadow:0 8px 20px rgba(45,90,39,.3);}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:12px;color:#fff;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(60px);opacity:0;transition:all .4s;z-index:9999;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.s{background:linear-gradient(135deg,#059669,#10b981);}
+.toast.e{background:linear-gradient(135deg,#dc2626,#ef4444);}
+@media(max-width:1024px){.mc{margin-left:0;}.grid2{grid-template-columns:1fr;}}
+@media(max-width:600px){.ph{flex-direction:column;text-align:center;}.pi-meta{justify-content:center;}}
+</style>
+</head>
+<body>
+<%- include('partials/sidebar', { active: 'profil' }) %>
+<main class="mc">
+  <div class="ph">
+    <div class="pa"><%= profileUser.nama.charAt(0).toUpperCase() %></div>
+    <div class="pi">
+      <h2><%= profileUser.nama %></h2>
+      <div style="opacity:.8;font-size:.9rem;"><%= profileUser.email %></div>
+      <div class="pi-meta">
+        <span class="pb <%= profileUser.peran %>"><%- {admin:'👑 Admin',petani:'🌾 Petani',kader:'🤝 Kader',dinas:'🏛️ Dinas'}[profileUser.peran]||profileUser.peran %></span>
+        <% if(profileUser.kelompok_tani) { %><span class="pb"><i class="fas fa-users"></i> <%= profileUser.kelompok_tani %></span><% } %>
+        <% if(profileUser.provinsi) { %><span class="pb"><i class="fas fa-map-pin"></i> <%= profileUser.provinsi %></span><% } %>
+        <span class="pb"><i class="fas fa-calendar-alt"></i> Bergabung <%= new Date(profileUser.created_at).toLocaleDateString('id-ID',{month:'long',year:'numeric'}) %></span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2">
+    <!-- Edit Profil -->
+    <div class="card">
+      <h3><i class="fas fa-user-edit" style="color:#4CAF50;"></i> Edit Profil</h3>
+      <div class="fi"><label>Nama Lengkap</label><input type="text" id="nama" value="<%= profileUser.nama %>"></div>
+      <div class="fi"><label>No. HP</label><input type="tel" id="no_hp" value="<%= profileUser.no_hp||'' %>" placeholder="08xxxxxxxxxx"></div>
+      <div class="fi"><label>Provinsi</label><input type="text" id="provinsi" value="<%= profileUser.provinsi||'' %>" placeholder="Jawa Barat"></div>
+      <div class="fi"><label>Kabupaten/Kota</label><input type="text" id="kabupaten" value="<%= profileUser.kabupaten||'' %>" placeholder="Bandung"></div>
+      <% if(profileUser.peran==='kader') { %>
+      <div class="fi"><label>Nama Kelompok Tani</label><input type="text" id="kelompok_tani" value="<%= profileUser.kelompok_tani||'' %>" placeholder="Kelompok Tani ..."></div>
+      <% } %>
+      <button class="save-btn" onclick="saveProfile()"><i class="fas fa-save"></i> Simpan Perubahan</button>
+    </div>
+
+    <!-- Info Akun -->
+    <div class="card">
+      <h3><i class="fas fa-info-circle" style="color:#2563eb;"></i> Informasi Akun</h3>
+      <div class="fi"><label>Email</label><div class="fi-val"><%= profileUser.email %></div></div>
+      <div class="fi"><label>Peran</label><div class="fi-val"><%- {admin:'👑 Admin',petani:'🌾 Petani',kader:'🤝 Kader',dinas:'🏛️ Dinas'}[profileUser.peran]||profileUser.peran %></div></div>
+      <div class="fi"><label>Status Akun</label><div class="fi-val" style="color:<%= profileUser.aktif?'#16a34a':'#dc2626' %>"><i class="fas fa-circle" style="font-size:.6rem;"></i> <%= profileUser.aktif ? 'Aktif' : 'Nonaktif' %></div></div>
+      <div class="fi"><label>Terdaftar Sejak</label><div class="fi-val"><%= new Date(profileUser.created_at).toLocaleDateString('id-ID',{day:'2-digit',month:'long',year:'numeric'}) %></div></div>
+      <% if(profileUser.peran==='kader') { %>
+      <div style="margin-top:16px;padding:14px;background:#dbeafe;border-radius:12px;">
+        <div style="font-size:.82rem;font-weight:700;color:#1d4ed8;margin-bottom:4px;"><i class="fas fa-star"></i> Keistimewaan Kader</div>
+        <div style="font-size:.8rem;color:#1e40af;line-height:1.5;">Laporan hama Anda otomatis terverifikasi dan langsung muncul di peta radar dengan tanda ✓</div>
+      </div>
+      <% } %>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+async function saveProfile() {
+  const body = {
+    nama     : document.getElementById('nama')?.value,
+    no_hp    : document.getElementById('no_hp')?.value,
+    provinsi : document.getElementById('provinsi')?.value,
+    kabupaten: document.getElementById('kabupaten')?.value,
+  };
+  const kt = document.getElementById('kelompok_tani');
+  if (kt) body.kelompok_tani = kt.value;
+
+  try {
+    const r = await fetch('/api/profil', { method:'PATCH', headers:{'Content-Type':'application/json'}, body:JSON.stringify(body) });
+    const j = await r.json();
+    showToast(j.sukses ? 'Profil berhasil disimpan!' : j.pesan, j.sukses ? 's' : 'e');
+  } catch {
+    showToast('Terjadi kesalahan.', 'e');
+  }
+}
+function showToast(msg, type='s') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = `toast ${type}`;
+  setTimeout(() => t.classList.add('show'), 10);
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bantuan Dinas - Sinar Tani</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; color: #333; }
+        .sidebar {
+            position: fixed; left: 0; top: 0; width: 260px; height: 100vh;
+            background: linear-gradient(180deg, #2d5a27 0%, #1e3d1a 100%);
+            color: white; padding: 20px; overflow-y: auto; z-index: 1000;
+        }
+        .sidebar-header { text-align: center; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header h2 { font-size: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .sidebar-menu { list-style: none; margin-top: 30px; }
+        .sidebar-menu li { margin-bottom: 10px; }
+        .sidebar-menu a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: rgba(255,255,255,0.8); text-decoration: none; border-radius: 10px; transition: all 0.3s; }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.1); color: white; transform: translateX(5px); }
+        .main-content { margin-left: 260px; padding: 30px; }
+        .header { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .header h1 { color: #2d5a27; font-size: 1.8rem; }
+        .info-banner {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white; padding: 25px; border-radius: 15px; margin-bottom: 30px;
+            display: flex; align-items: center; gap: 20px;
+        }
+        .info-banner i { font-size: 3rem; }
+        .info-banner h3 { font-size: 1.3rem; margin-bottom: 5px; }
+        .content-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 30px; }
+        .card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .card-title { font-size: 1.3rem; color: #2d5a27; display: flex; align-items: center; gap: 10px; }
+        .search-box { position: relative; margin-bottom: 20px; }
+        .search-box input { width: 100%; padding: 12px 15px 12px 45px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; }
+        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; }
+        .program-list { list-style: none; }
+        .program-item { border: 2px solid #e0e0e0; border-radius: 12px; padding: 20px; margin-bottom: 15px; transition: all 0.3s; }
+        .program-item:hover { border-color: #4CAF50; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .program-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
+        .program-title { font-size: 1.1rem; color: #333; margin-bottom: 5px; }
+        .program-badge { padding: 4px 12px; border-radius: 15px; font-size: 0.8rem; font-weight: bold; }
+        .badge-aktif { background: #e8f5e9; color: #4CAF50; }
+        .badge-pendaftaran { background: #fff3e0; color: #FF9800; }
+        .badge-segera { background: #e3f2fd; color: #2196F3; }
+        .program-desc { color: #666; font-size: 0.95rem; margin-bottom: 15px; line-height: 1.5; }
+        .program-meta { display: flex; gap: 20px; font-size: 0.9rem; color: #666; margin-bottom: 15px; flex-wrap: wrap; }
+        .program-meta span { display: flex; align-items: center; gap: 5px; }
+        .program-footer { display: flex; justify-content: space-between; align-items: center; }
+        .btn-apply { padding: 8px 20px; background: #4CAF50; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; transition: all 0.3s; text-decoration: none; display: inline-block; }
+        .btn-apply:hover { background: #45a049; }
+        .btn-apply.disabled { background: #ccc; cursor: not-allowed; }
+        .btn-apply-login { padding: 8px 20px; background: #667eea; color: white; border: none; border-radius: 20px; cursor: pointer; font-weight: bold; text-decoration: none; display: inline-block; }
+        .category-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab-btn { padding: 10px 20px; border: 2px solid #e0e0e0; background: white; border-radius: 25px; cursor: pointer; transition: all 0.3s; }
+        .tab-btn.active, .tab-btn:hover { background: #4CAF50; color: white; border-color: #4CAF50; }
+        .contact-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 20px; }
+        .contact-card h3 { color: #2d5a27; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .contact-item { display: flex; align-items: center; gap: 15px; padding: 15px 0; border-bottom: 1px solid #eee; }
+        .contact-item:last-child { border-bottom: none; }
+        .contact-icon { width: 45px; height: 45px; border-radius: 50%; background: #e8f5e9; color: #4CAF50; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; }
+        .contact-text h4 { margin-bottom: 3px; color: #333; }
+        .contact-text p { color: #666; font-size: 0.9rem; }
+        .faq-item { border-bottom: 1px solid #eee; padding: 20px 0; }
+        .faq-question { display: flex; justify-content: space-between; align-items: center; cursor: pointer; font-weight: 600; color: #333; }
+        .faq-answer { margin-top: 10px; color: #666; line-height: 1.6; display: none; }
+        .faq-item.active .faq-answer { display: block; }
+        .faq-item.active .faq-question i { transform: rotate(180deg); }
+        .loading-state { text-align: center; padding: 30px; color: #999; }
+        /* Panel tambah bantuan untuk dinas/admin */
+        .add-panel { background: #e8f5e9; border: 2px solid #4CAF50; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
+        .add-panel h4 { color: #2d5a27; margin-bottom: 15px; }
+        .add-panel input, .add-panel select, .add-panel textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; margin-bottom: 10px; font-family: inherit; font-size: 0.95rem; }
+        .btn-add-bantuan { padding: 10px 25px; background: #2d5a27; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/sidebar', { active: 'bantuan-dinas' }) %>
+
+    <main class="main-content">
+        <div class="header">
+            <h1><i class="fas fa-hands-helping"></i> Bantuan Dinas</h1>
+            <p>Akses program bantuan dan informasi dari Dinas Pertanian</p>
+        </div>
+
+        <div class="info-banner">
+            <i class="fas fa-info-circle"></i>
+            <div>
+                <h3>Butuh Bantuan?</h3>
+                <p>Hubungi call center Dinas Pertanian di <strong>1500-454</strong> atau kunjungi kantor dinas terdekat. Kami siap membantu!</p>
+            </div>
+        </div>
+
+        <div class="content-grid">
+            <div class="left-column">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-list-alt"></i> Program Bantuan Tersedia</h3>
+                    </div>
+
+                    <% if (user && (user.peran === 'dinas' || user.peran === 'admin')) { %>
+                    <div class="add-panel">
+                        <h4><i class="fas fa-plus-circle"></i> Tambah Program Bantuan Baru</h4>
+                        <input type="text" id="inputJudul" placeholder="Judul program bantuan *">
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+                            <select id="inputJenis">
+                                <option value="bibit">Bibit</option>
+                                <option value="pupuk">Pupuk</option>
+                                <option value="alsintan">Alsintan</option>
+                                <option value="pelatihan">Pelatihan</option>
+                                <option value="subsidi">Subsidi</option>
+                                <option value="lainnya">Lainnya</option>
+                            </select>
+                            <input type="text" id="inputProvinsi" placeholder="Provinsi (opsional)">
+                        </div>
+                        <textarea id="inputDeskripsi" rows="2" placeholder="Deskripsi singkat program..."></textarea>
+                        <input type="text" id="inputKontak" placeholder="Kontak (HP/email dinas)">
+                        <div id="errorBantuan" style="color:#e53935; font-size:0.85rem; display:none; margin-bottom:8px;"></div>
+                        <button class="btn-add-bantuan" onclick="tambahBantuan()">
+                            <i class="fas fa-plus"></i> Tambahkan Program
+                        </button>
+                    </div>
+                    <% } %>
+
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Cari program bantuan..." id="searchProgram" oninput="filterBantuan()">
+                    </div>
+
+                    <div class="category-tabs">
+                        <button class="tab-btn active" onclick="setFilter('all', this)">Semua</button>
+                        <button class="tab-btn" onclick="setFilter('bibit', this)">Bibit</button>
+                        <button class="tab-btn" onclick="setFilter('pupuk', this)">Pupuk</button>
+                        <button class="tab-btn" onclick="setFilter('alsintan', this)">Alsintan</button>
+                        <button class="tab-btn" onclick="setFilter('pelatihan', this)">Pelatihan</button>
+                    </div>
+
+                    <ul class="program-list" id="programList">
+                        <li class="loading-state"><i class="fas fa-spinner fa-spin"></i> Memuat program bantuan...</li>
+                    </ul>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title"><i class="fas fa-question-circle"></i> FAQ Bantuan Dinas</h3>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+                            <span>Siapa saja yang bisa mendaftar program bantuan?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">Petani aktif, kelompok tani, atau Gapoktan yang memiliki KTP, KK, dan surat keterangan domisili dari desa. Wajib memiliki lahan pertanian aktif minimal 0.5 hektar.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+                            <span>Bagaimana cara cek status pengajuan bantuan?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">Anda dapat mengecek status pengajuan melalui menu Profil atau menghubungi call center Dinas Pertanian dengan menyebutkan nomor registrasi.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+                            <span>Apakah boleh mengajukan lebih dari satu program?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">Ya, diperbolehkan mengajukan multiple program selama jadwal tidak bentrok dan memenuhi persyaratan masing-masing program.</div>
+                    </div>
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="this.parentElement.classList.toggle('active')">
+                            <span>Berapa lama proses verifikasi pengajuan?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer">Proses verifikasi berkas memakan waktu 7-14 hari kerja. Setelah diverifikasi, tim akan melakukan survey lapangan. Total estimasi 3-4 minggu hingga bantuan disalurkan.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="right-column">
+                <div class="contact-card">
+                    <h3><i class="fas fa-phone"></i> Hubungi Dinas</h3>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-phone"></i></div>
+                        <div class="contact-text"><h4>Call Center</h4><p>1500-454 (Bebas Pulsa)</p></div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fab fa-whatsapp"></i></div>
+                        <div class="contact-text"><h4>WhatsApp</h4><p>0812-3456-7890</p></div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-envelope"></i></div>
+                        <div class="contact-text"><h4>Email</h4><p>info@pertanian.go.id</p></div>
+                    </div>
+                    <div class="contact-item">
+                        <div class="contact-icon"><i class="fas fa-clock"></i></div>
+                        <div class="contact-text"><h4>Jam Layanan</h4><p>Sen-Jum, 08.00–16.00 WIB</p></div>
+                    </div>
+                </div>
+
+                <% if (!user) { %>
+                <div class="contact-card" style="background: #fff3e0; border: 2px solid #FF9800;">
+                    <h3 style="color: #e65100;"><i class="fas fa-lock"></i> Login Diperlukan</h3>
+                    <p style="color: #666; margin-bottom: 15px;">Login untuk mendaftar program bantuan dan melacak status pengajuan Anda.</p>
+                    <a href="/auth/login?redirect=/bantuan-dinas" style="display:block; text-align:center; padding:10px; background:#FF9800; color:white; border-radius:8px; text-decoration:none; font-weight:600;">
+                        <i class="fas fa-sign-in-alt"></i> Login Sekarang
+                    </a>
+                </div>
+                <% } %>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let allBantuan = [];
+        let filterJenis = 'all';
+        const isLoggedIn = <%= user ? 'true' : 'false' %>;
+
+        async function loadBantuan() {
+            try {
+                const res  = await fetch('/api/bantuan');
+                const json = await res.json();
+                allBantuan = json.sukses ? json.data : [];
+
+                // Jika DB masih kosong, tampilkan data demo
+                if (!allBantuan.length) {
+                    allBantuan = [
+                        { id:1, judul:'Bantuan Benih Padi Unggul 2026', jenis:'bibit', deskripsi:'Program bantuan benih padi varietas unggul untuk petani guna meningkatkan produktivitas panen. Varietas IR64, Ciherang, dan Mekongga.', provinsi:'Jawa Barat', tanggal_mulai:'2026-01-01', tanggal_selesai:'2026-03-31', kuota:2000, kontak:'Dinas Pertanian Jabar' },
+                        { id:2, judul:'Subsidi Pupuk Organik 2026', jenis:'pupuk', deskripsi:'Bantuan subsidi 50% untuk pembelian pupuk organik bersertifikat. Mendukung program pertanian ramah lingkungan.', provinsi:'Nasional', tanggal_mulai:'2026-02-15', tanggal_selesai:'2026-02-28', kuota:1000, kontak:'Kementan RI' },
+                        { id:3, judul:'Bantuan Alsintan 2026', jenis:'alsintan', deskripsi:'Program bantuan traktor, hand tractor, dan pompa air untuk kelompok tani.', provinsi:'Nasional', tanggal_mulai:'2026-04-01', tanggal_selesai:'2026-06-30', kuota:500, kontak:'Dinas Pertanian' },
+                        { id:4, judul:'Pelatihan Smart Farming Gratis', jenis:'pelatihan', deskripsi:'Pelatihan penggunaan teknologi IoT, drone sprayer, dan aplikasi manajemen pertanian modern. Sertifikat resmi dari Dinas.', provinsi:'10 Kota Besar', tanggal_mulai:'2026-03-01', tanggal_selesai:'2026-12-31', kuota:100, kontak:'Dinas Pertanian' },
+                    ];
+                }
+                renderBantuan();
+            } catch {
+                document.getElementById('programList').innerHTML = '<li class="loading-state">Gagal memuat data. Coba refresh halaman.</li>';
+            }
+        }
+
+        function renderBantuan() {
+            const keyword  = document.getElementById('searchProgram').value.toLowerCase();
+            let filtered   = allBantuan.filter(b => {
+                const matchKata  = b.judul.toLowerCase().includes(keyword);
+                const matchJenis = filterJenis === 'all' || b.jenis === filterJenis;
+                return matchKata && matchJenis;
+            });
+
+            const list = document.getElementById('programList');
+            if (!filtered.length) {
+                list.innerHTML = '<li class="loading-state"><i class="fas fa-search"></i><br>Tidak ada program ditemukan.</li>';
+                return;
+            }
+
+            list.innerHTML = filtered.map(b => {
+                const tglMulai = b.tanggal_mulai ? new Date(b.tanggal_mulai).toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'}) : '-';
+                const tglAkhir = b.tanggal_selesai ? new Date(b.tanggal_selesai).toLocaleDateString('id-ID', {day:'numeric', month:'short', year:'numeric'}) : '-';
+
+                const btnHtml = isLoggedIn
+                    ? `<button class="btn-apply" onclick="daftarProgram('${b.judul}')"><i class="fas fa-paper-plane"></i> Daftar</button>`
+                    : `<a href="/auth/login?redirect=/bantuan-dinas" class="btn-apply-login"><i class="fas fa-sign-in-alt"></i> Login untuk Daftar</a>`;
+
+                return `
+                <li class="program-item" data-jenis="${b.jenis}">
+                    <div class="program-header">
+                        <div>
+                            <h4 class="program-title">${b.judul}</h4>
+                            <span class="program-badge badge-aktif"><i class="fas fa-check-circle"></i> Aktif</span>
+                        </div>
+                    </div>
+                    <p class="program-desc">${b.deskripsi || 'Informasi lebih lanjut segera tersedia.'}</p>
+                    <div class="program-meta">
+                        ${b.tanggal_mulai ? `<span><i class="fas fa-calendar"></i> ${tglMulai} – ${tglAkhir}</span>` : ''}
+                        ${b.provinsi ? `<span><i class="fas fa-map-marker-alt"></i> ${b.provinsi}</span>` : ''}
+                        <span><i class="fas fa-tag"></i> ${b.jenis.charAt(0).toUpperCase() + b.jenis.slice(1)}</span>
+                    </div>
+                    <div class="program-footer">
+                        <span style="color:#666; font-size:0.9rem;">
+                            ${b.kuota ? `Kuota: <strong style="color:#4CAF50">${b.kuota} penerima</strong>` : ''}
+                            ${b.kontak ? ` | Kontak: ${b.kontak}` : ''}
+                        </span>
+                        ${btnHtml}
+                    </div>
+                </li>`;
+            }).join('');
+        }
+
+        function filterBantuan() { renderBantuan(); }
+
+        function setFilter(jenis, btn) {
+            filterJenis = jenis;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderBantuan();
+        }
+
+        function daftarProgram(judul) {
+            alert(`Pendaftaran untuk program:\n"${judul}"\n\nSilakan kunjungi kantor Dinas Pertanian setempat atau hubungi call center 1500-454 dengan membawa:\n• KTP & KK\n• Surat domisili dari desa\n• Bukti kepemilikan/penggunaan lahan`);
+        }
+
+        async function tambahBantuan() {
+            const judul    = document.getElementById('inputJudul').value.trim();
+            const jenis    = document.getElementById('inputJenis').value;
+            const provinsi = document.getElementById('inputProvinsi').value.trim();
+            const deskripsi= document.getElementById('inputDeskripsi').value.trim();
+            const kontak   = document.getElementById('inputKontak').value.trim();
+            const errEl    = document.getElementById('errorBantuan');
+            const addBtn   = document.querySelector('.btn-add-bantuan');
+
+            if (!judul) { errEl.textContent = 'Judul wajib diisi.'; errEl.style.display='block'; return; }
+            errEl.style.display = 'none';
+
+            // Disable button saat submit
+            addBtn.disabled = true;
+            addBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+            try {
+                const res  = await fetch('/api/bantuan', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        judul, 
+                        jenis_bantuan: jenis, 
+                        jenis,
+                        provinsi, 
+                        deskripsi, 
+                        kontak 
+                    })
+                });
+                const json = await res.json();
+                if (json.sukses) {
+                    // Reset form
+                    document.getElementById('inputJudul').value    = '';
+                    document.getElementById('inputDeskripsi').value = '';
+                    document.getElementById('inputKontak').value   = '';
+                    document.getElementById('inputProvinsi').value = '';
+                    await loadBantuan();
+                    alert('Program bantuan berhasil ditambahkan! ✅');
+                } else {
+                    errEl.textContent = json.pesan || 'Gagal menambahkan program.'; errEl.style.display='block';
+                }
+            } catch (e) {
+                console.error(e);
+                errEl.textContent = 'Terjadi kesalahan. Coba lagi.'; errEl.style.display='block';
+            } finally {
+                addBtn.disabled = false;
+                addBtn.innerHTML = '<i class="fas fa-plus"></i> Tambahkan Program';
+            }
+        }
+
+        loadBantuan();
+    </script>
+</body>
+</html>

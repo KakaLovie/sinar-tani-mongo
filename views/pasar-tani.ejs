@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pasar Tani - Sinar Tani</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f5f7fa; color: #333; }
+        .sidebar {
+            position: fixed; left: 0; top: 0; width: 260px; height: 100vh;
+            background: linear-gradient(180deg, #2d5a27 0%, #1e3d1a 100%);
+            color: white; padding: 20px; overflow-y: auto; z-index: 1000;
+        }
+        .sidebar-header { text-align: center; padding: 20px 0; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        .sidebar-header h2 { font-size: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 10px; }
+        .sidebar-menu { list-style: none; margin-top: 30px; }
+        .sidebar-menu li { margin-bottom: 10px; }
+        .sidebar-menu a {
+            display: flex; align-items: center; gap: 12px; padding: 12px 15px;
+            color: rgba(255,255,255,0.8); text-decoration: none; border-radius: 10px; transition: all 0.3s;
+        }
+        .sidebar-menu a:hover, .sidebar-menu a.active { background: rgba(255,255,255,0.1); color: white; transform: translateX(5px); }
+        .main-content { margin-left: 260px; padding: 30px; }
+        .header {
+            background: white; padding: 20px; border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .header h1 { color: #2d5a27; font-size: 1.8rem; }
+        .btn-primary {
+            padding: 12px 25px; background: linear-gradient(45deg, #4CAF50, #45a049);
+            color: white; border: none; border-radius: 25px;
+            cursor: pointer; font-weight: bold; transition: transform 0.3s; text-decoration: none;
+        }
+        .btn-primary:hover { transform: translateY(-2px); }
+        .market-filters {
+            background: white; padding: 20px; border-radius: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 30px;
+            display: flex; gap: 15px; flex-wrap: wrap;
+        }
+        .search-box { flex: 1; min-width: 250px; position: relative; }
+        .search-box input { width: 100%; padding: 12px 15px 12px 45px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; }
+        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #999; }
+        .filter-select { padding: 12px 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1rem; min-width: 150px; }
+        .market-grid { display: grid; grid-template-columns: 3fr 1fr; gap: 30px; }
+        .products-section h2 { color: #2d5a27; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; }
+        .products-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px; }
+        .product-card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: transform 0.3s, box-shadow 0.3s; }
+        .product-card:hover { transform: translateY(-5px); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+        .product-image { height: 180px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); display: flex; align-items: center; justify-content: center; color: white; font-size: 4rem; }
+        .product-info { padding: 20px; }
+        .product-title { font-size: 1.2rem; font-weight: bold; color: #333; margin-bottom: 5px; }
+        .product-seller { color: #666; font-size: 0.9rem; margin-bottom: 10px; }
+        .product-price { font-size: 1.4rem; color: #4CAF50; font-weight: bold; margin-bottom: 10px; }
+        .product-meta { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 0.85rem; color: #666; }
+        .product-location { display: flex; align-items: center; gap: 5px; }
+        .product-stock { padding: 4px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: 500; }
+        .stock-available { background: #e8f5e9; color: #4CAF50; }
+        .stock-limited { background: #fff3e0; color: #FF9800; }
+        .btn-buy { width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: background 0.3s; }
+        .btn-buy:hover { background: #45a049; }
+        .sidebar-market { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); height: fit-content; }
+        .sidebar-market h3 { color: #2d5a27; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e0e0e0; }
+        .ticker-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #f0f0f0; }
+        .ticker-item:last-child { border-bottom: none; }
+        .ticker-name { font-weight: 500; font-size: 0.9rem; }
+        .ticker-price { font-weight: bold; color: #4CAF50; font-size: 0.9rem; }
+        .ticker-lokasi { font-size: 0.75rem; color: #999; }
+        .category-list { list-style: none; }
+        .category-list li { padding: 10px 0; display: flex; align-items: center; gap: 10px; cursor: pointer; transition: color 0.3s; border-bottom: 1px solid #f5f5f5; }
+        .category-list li:hover { color: #4CAF50; }
+        .category-list i { width: 25px; text-align: center; color: #4CAF50; }
+        .loading-state { text-align: center; padding: 40px; color: #999; }
+        .loading-state i { font-size: 2rem; margin-bottom: 10px; color: #ddd; display: block; }
+        /* Modal Jual Produk */
+        .modal-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 2000; align-items: center; justify-content: center; }
+        .modal-overlay.show { display: flex; }
+        .modal { background: white; border-radius: 20px; padding: 30px; width: 90%; max-width: 500px; max-height: 90vh; overflow-y: auto; }
+        .modal h2 { color: #2d5a27; margin-bottom: 20px; }
+        .modal .form-group { margin-bottom: 15px; }
+        .modal label { display: block; margin-bottom: 6px; color: #555; font-weight: 500; }
+        .modal input, .modal select, .modal textarea {
+            width: 100%; padding: 10px 12px; border: 2px solid #e0e0e0;
+            border-radius: 8px; font-size: 1rem; font-family: inherit;
+        }
+        .modal input:focus, .modal select:focus, .modal textarea:focus { outline: none; border-color: #4CAF50; }
+        .modal-footer { display: flex; gap: 10px; margin-top: 20px; }
+        .btn-cancel { flex: 1; padding: 12px; background: #f5f5f5; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; }
+        .btn-submit { flex: 2; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; font-weight: bold; }
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; }
+            .market-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <%- include('partials/sidebar', { active: 'pasar-tani' }) %>
+
+    <main class="main-content">
+        <div class="header">
+            <div>
+                <h1><i class="fas fa-store"></i> Pasar Tani</h1>
+                <p>Jual beli hasil pertanian langsung dari petani</p>
+            </div>
+            <% if (user && (user.peran === 'petani' || user.peran === 'pedagang' || user.peran === 'admin')) { %>
+            <button class="btn-primary" onclick="document.getElementById('modalJual').classList.add('show')">
+                <i class="fas fa-plus"></i> Jual Produk
+            </button>
+            <% } else if (!user) { %>
+            <a href="/auth/login?redirect=/pasar-tani" class="btn-primary">
+                <i class="fas fa-sign-in-alt"></i> Login untuk Berjualan
+            </a>
+            <% } %>
+        </div>
+
+        <div class="market-filters">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Cari produk pertanian..." id="searchInput" oninput="filterProducts()">
+            </div>
+            <select class="filter-select" id="filterKategori" onchange="filterProducts()">
+                <option value="all">Semua Kategori</option>
+                <option value="sayuran">Sayuran</option>
+                <option value="buah">Buah-buahan</option>
+                <option value="biji-bijian">Biji-bijian</option>
+                <option value="rempah">Rempah & Bumbu</option>
+                <option value="ternak">Ternak</option>
+                <option value="lainnya">Lainnya</option>
+            </select>
+            <select class="filter-select" id="filterHarga" onchange="sortProducts()">
+                <option value="default">Urutkan Harga</option>
+                <option value="low">Termurah</option>
+                <option value="high">Termahal</option>
+            </select>
+        </div>
+
+        <div class="market-grid">
+            <div class="products-section">
+                <h2><i class="fas fa-fire"></i> Produk Tersedia <span id="productCount" style="font-size:1rem; color:#999; font-weight:normal;"></span></h2>
+                <div class="products-grid" id="productsGrid">
+                    <div class="loading-state" style="grid-column:1/-1;">
+                        <i class="fas fa-spinner fa-spin"></i>
+                        Memuat produk...
+                    </div>
+                </div>
+            </div>
+
+            <aside class="sidebar-market">
+                <div class="price-ticker" style="margin-bottom:25px;">
+                    <h3><i class="fas fa-chart-line"></i> Harga Pasar Hari Ini</h3>
+                    <div id="hargaTicker">
+                        <div style="text-align:center; padding:15px; color:#999;">
+                            <i class="fas fa-spinner fa-spin"></i> Memuat...
+                        </div>
+                    </div>
+                </div>
+                <h3 style="color:#2d5a27; margin-bottom:15px;"><i class="fas fa-tags"></i> Kategori</h3>
+                <ul class="category-list">
+                    <li onclick="setKategori('biji-bijian')"><i class="fas fa-seedling"></i> Padi & Palawija</li>
+                    <li onclick="setKategori('sayuran')"><i class="fas fa-carrot"></i> Sayuran</li>
+                    <li onclick="setKategori('buah')"><i class="fas fa-apple-alt"></i> Buah-buahan</li>
+                    <li onclick="setKategori('rempah')"><i class="fas fa-pepper-hot"></i> Rempah & Bumbu</li>
+                    <li onclick="setKategori('lainnya')"><i class="fas fa-leaf"></i> Lainnya</li>
+                    <li onclick="setKategori('all')"><i class="fas fa-th"></i> Tampilkan Semua</li>
+                </ul>
+            </aside>
+        </div>
+    </main>
+
+    <!-- Modal Jual Produk -->
+    <% if (user) { %>
+    <div class="modal-overlay" id="modalJual">
+        <div class="modal">
+            <h2><i class="fas fa-plus-circle"></i> Jual Produk Baru</h2>
+            <div class="form-group">
+                <label>Nama Produk *</label>
+                <input type="text" id="inputNama" placeholder="Contoh: Beras IR64 Premium">
+            </div>
+            <div class="form-group">
+                <label>Kategori *</label>
+                <select id="inputKategori">
+                    <option value="sayuran">Sayuran</option>
+                    <option value="buah">Buah-buahan</option>
+                    <option value="biji-bijian">Biji-bijian / Padi</option>
+                    <option value="rempah">Rempah & Bumbu</option>
+                    <option value="ternak">Ternak</option>
+                    <option value="lainnya">Lainnya</option>
+                </select>
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px;">
+                <div class="form-group">
+                    <label>Harga (Rp) *</label>
+                    <input type="number" id="inputHarga" placeholder="12500">
+                </div>
+                <div class="form-group">
+                    <label>Satuan</label>
+                    <select id="inputSatuan">
+                        <option value="kg">kg</option>
+                        <option value="ton">ton</option>
+                        <option value="ikat">ikat</option>
+                        <option value="buah">buah</option>
+                        <option value="liter">liter</option>
+                    </select>
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Stok</label>
+                <input type="number" id="inputStok" placeholder="100">
+            </div>
+            <div class="form-group">
+                <label>Lokasi</label>
+                <input type="text" id="inputLokasi" placeholder="Contoh: Subang, Jawa Barat">
+            </div>
+            <div class="form-group">
+                <label>Deskripsi</label>
+                <textarea id="inputDeskripsi" rows="3" placeholder="Jelaskan keunggulan produk Anda..."></textarea>
+            </div>
+            <div id="errorJual" style="color:#e53935; font-size:0.9rem; display:none; margin-bottom:10px;"></div>
+            <div class="modal-footer">
+                <button class="btn-cancel" onclick="document.getElementById('modalJual').classList.remove('show')">Batal</button>
+                <button class="btn-submit" onclick="submitProduk()">
+                    <i class="fas fa-check"></i> Tambahkan Produk
+                </button>
+            </div>
+        </div>
+    </div>
+    <% } %>
+
+    <script>
+        let allProducts = [];
+
+        const iconMap = {
+            sayuran: 'fa-carrot', buah: 'fa-apple-alt',
+            'biji-bijian': 'fa-seedling', rempah: 'fa-pepper-hot',
+            ternak: 'fa-horse', lainnya: 'fa-leaf'
+        };
+        const gradientMap = {
+            sayuran: 'linear-gradient(135deg, #56ab2f, #a8e063)',
+            buah: 'linear-gradient(135deg, #f093fb, #f5576c)',
+            'biji-bijian': 'linear-gradient(135deg, #f7971e, #ffd200)',
+            rempah: 'linear-gradient(135deg, #c94b4b, #4b134f)',
+            ternak: 'linear-gradient(135deg, #4facfe, #00f2fe)',
+            lainnya: 'linear-gradient(135deg, #667eea, #764ba2)'
+        };
+
+        async function loadProducts() {
+            try {
+                const res  = await fetch('/api/produk?limit=50');
+                const json = await res.json();
+                allProducts = json.sukses ? json.data : [];
+                renderProducts(allProducts);
+            } catch {
+                renderProducts([]);
+            }
+        }
+
+        function renderProducts(products) {
+            const grid = document.getElementById('productsGrid');
+            document.getElementById('productCount').textContent = `(${products.length} produk)`;
+
+            if (!products.length) {
+                grid.innerHTML = `
+                    <div class="loading-state" style="grid-column:1/-1;">
+                        <i class="fas fa-box-open"></i>
+                        <p>Belum ada produk tersedia.</p>
+                    </div>`;
+                return;
+            }
+
+            grid.innerHTML = products.map(p => `
+                <div class="product-card">
+                    <div class="product-image" style="background: ${gradientMap[p.kategori] || gradientMap.lainnya}">
+                        <i class="fas ${iconMap[p.kategori] || 'fa-leaf'}"></i>
+                    </div>
+                    <div class="product-info">
+                        <div class="product-title">${p.nama}</div>
+                        <div class="product-seller"><i class="fas fa-user"></i> ${p.nama_penjual || 'Petani'}</div>
+                        <div class="product-price">Rp ${Number(p.harga).toLocaleString('id-ID')}/${p.satuan}</div>
+                        <div class="product-meta">
+                            <div class="product-location">
+                                <i class="fas fa-map-marker-alt"></i> ${p.lokasi || (p.provinsi || 'Indonesia')}
+                            </div>
+                            <span class="product-stock ${p.stok > 10 ? 'stock-available' : 'stock-limited'}">
+                                ${p.stok > 10 ? 'Tersedia' : p.stok > 0 ? 'Terbatas' : 'Habis'}
+                            </span>
+                        </div>
+                        <button class="btn-buy" onclick="beliProduk('${p.id}', '${p.nama}', ${p.harga}, '${p.satuan}', '${p.no_hp_penjual || ''}', '${p.nama_penjual || 'Petani'}')">
+                            <i class="fab fa-whatsapp"></i> Hubungi Penjual
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterProducts() {
+            const keyword  = document.getElementById('searchInput').value.toLowerCase();
+            const kategori = document.getElementById('filterKategori').value;
+            let filtered   = allProducts.filter(p => {
+                const matchKata    = p.nama.toLowerCase().includes(keyword) || (p.nama_penjual || '').toLowerCase().includes(keyword);
+                const matchKategori = kategori === 'all' || p.kategori === kategori;
+                return matchKata && matchKategori;
+            });
+            sortAndRender(filtered);
+        }
+
+        function sortAndRender(products) {
+            const sort = document.getElementById('filterHarga').value;
+            if (sort === 'low')  products.sort((a, b) => a.harga - b.harga);
+            if (sort === 'high') products.sort((a, b) => b.harga - a.harga);
+            renderProducts(products);
+        }
+
+        function sortProducts() {
+            filterProducts();
+        }
+
+        function setKategori(k) {
+            document.getElementById('filterKategori').value = k;
+            filterProducts();
+        }
+
+        function beliProduk(id, nama, harga, satuan, noHp, namaPenjual) {
+            // Format nomor WhatsApp (hapus karakter non-numeric, tambahkan kode negara)
+            let phone = noHp || '';
+            phone = phone.replace(/\D/g, '');
+            if (phone.startsWith('0')) phone = '62' + phone.slice(1);
+            if (!phone.startsWith('62')) phone = '62' + phone;
+            
+            // Buat pesan WhatsApp
+            const message = `Halo ${namaPenjual || 'Penjual'}, saya tertarik dengan produk Anda:\n\n*Nama:* ${nama}\n*Harga:* Rp ${Number(harga).toLocaleString('id-ID')}/${satuan}\n\nApakah produk masih tersedia?`;
+            const waUrl = `https://wa.me/${phone}?text=${encodeURIComponent(message)}`;
+            
+            // Buka WhatsApp jika nomor tersedia,否则 tampilkan alert
+            if (noHp && phone.length > 8) {
+                window.open(waUrl, '_blank');
+            } else {
+                alert(`Menghubungi penjual untuk:\n${nama}\nHarga: Rp ${Number(harga).toLocaleString('id-ID')}/${satuan}\n\nPenjual: ${namaPenjual || 'Petani'}\n\n(Fitur keranjang belanja segera hadir!)`);
+            }
+        }
+
+        async function submitProduk() {
+            const nama     = document.getElementById('inputNama').value.trim();
+            const harga    = document.getElementById('inputHarga').value;
+            const kategori = document.getElementById('inputKategori').value;
+            const satuan   = document.getElementById('inputSatuan').value;
+            const stok     = document.getElementById('inputStok').value || 0;
+            const lokasi   = document.getElementById('inputLokasi').value.trim();
+            const deskripsi= document.getElementById('inputDeskripsi').value.trim();
+            const errEl    = document.getElementById('errorJual');
+            const submitBtn = document.querySelector('.btn-submit');
+
+            if (!nama || !harga) {
+                errEl.textContent = 'Nama produk dan harga wajib diisi.';
+                errEl.style.display = 'block'; return;
+            }
+            errEl.style.display = 'none';
+
+            // Disable button saat submit
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Menyimpan...';
+
+            try {
+                const res  = await fetch('/api/produk', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        nama, 
+                        harga: Number(harga), 
+                        kategori, 
+                        satuan, 
+                        stok: Number(stok), 
+                        provinsi: lokasi, // Map lokasi ke provinsi
+                        deskripsi 
+                    })
+                });
+                const json = await res.json();
+                if (json.sukses) {
+                    document.getElementById('modalJual').classList.remove('show');
+                    // Reset form
+                    document.getElementById('inputNama').value = '';
+                    document.getElementById('inputHarga').value = '';
+                    document.getElementById('inputStok').value = '';
+                    document.getElementById('inputLokasi').value = '';
+                    document.getElementById('inputDeskripsi').value = '';
+                    await loadProducts();
+                    alert('Produk berhasil ditambahkan! 🎉');
+                } else {
+                    errEl.textContent = json.pesan || 'Gagal menambahkan produk.';
+                    errEl.style.display = 'block';
+                }
+            } catch (e) {
+                console.error(e);
+                errEl.textContent = 'Terjadi kesalahan. Coba lagi.';
+                errEl.style.display = 'block';
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = '<i class="fas fa-check"></i> Tambahkan Produk';
+            }
+        }
+
+        // Fetch harga terkini untuk ticker
+        async function loadHargaTicker() {
+            try {
+                const res  = await fetch('/api/harga/terkini');
+                const json = await res.json();
+                const el   = document.getElementById('hargaTicker');
+
+                if (!json.sukses || !json.data.length) { el.innerHTML = '<p style="color:#999;font-size:0.9rem;">Tidak ada data harga.</p>'; return; }
+
+                el.innerHTML = json.data.slice(0, 6).map(h => `
+                    <div class="ticker-item">
+                        <div>
+                            <div class="ticker-name">${h.komoditas}</div>
+                            <div class="ticker-lokasi">${h.lokasi}</div>
+                        </div>
+                        <div class="ticker-price">Rp ${Number(h.harga).toLocaleString('id-ID')}/${h.satuan}</div>
+                    </div>
+                `).join('');
+            } catch {}
+        }
+
+        // Tutup modal saat klik di luar
+        document.getElementById('modalJual')?.addEventListener('click', function(e) {
+            if (e.target === this) this.classList.remove('show');
+        });
+
+        loadProducts();
+        loadHargaTicker();
+    </script>
+</body>
+</html>

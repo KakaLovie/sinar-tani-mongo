@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dashboard — Sinar Tani</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',sans-serif;background:#f0f4f0;color:#333;}
+.mc{margin-left:260px;padding:28px;}
+.header{background:#fff;border-radius:16px;padding:22px 28px;margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+.header-left h1{font-size:1.5rem;color:#1e3d1a;font-weight:700;}
+.header-left p{color:#888;font-size:.88rem;margin-top:3px;}
+.user-chip{display:flex;align-items:center;gap:10px;}
+.ua{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#4CAF50,#81c784);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:1.1rem;}
+/* Stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+.sc{background:#fff;border-radius:16px;padding:22px;box-shadow:0 2px 12px rgba(0,0,0,.06);transition:transform .3s;cursor:default;}
+.sc:hover{transform:translateY(-4px);}
+.sc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px;}
+.si{width:48px;height:48px;border-radius:13px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;}
+.si.g{background:#dcfce7;color:#16a34a;} .si.b{background:#dbeafe;color:#2563eb;}
+.si.o{background:#fef3c7;color:#d97706;} .si.r{background:#fee2e2;color:#dc2626;}
+.sv{font-size:2.2rem;font-weight:700;color:#1a1a1a;line-height:1;}
+.sl{font-size:.82rem;color:#888;margin-top:4px;}
+.stag{font-size:.78rem;margin-top:10px;display:flex;align-items:center;gap:5px;}
+/* Hama banner */
+.hama-banner{display:none;background:linear-gradient(135deg,#fee2e2,#fff5f5);border:1.5px solid #fecaca;border-radius:14px;padding:16px 22px;margin-bottom:24px;align-items:center;gap:14px;}
+.hb-icon{width:44px;height:44px;background:#fee2e2;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0;animation:hbPulse 2s infinite;}
+@keyframes hbPulse{0%,100%{box-shadow:0 0 0 0 rgba(220,38,38,.4);}50%{box-shadow:0 0 0 8px rgba(220,38,38,0);}}
+.hb-text h4{font-weight:700;color:#991b1b;margin-bottom:3px;}
+.hb-text p{font-size:.85rem;color:#b91c1c;}
+.hb-btn{padding:9px 20px;background:#dc2626;color:#fff;border-radius:20px;text-decoration:none;font-size:.85rem;font-weight:700;flex-shrink:0;margin-left:auto;transition:all .2s;}
+.hb-btn:hover{background:#b91c1c;}
+/* Content grid */
+.grid2{display:grid;grid-template-columns:2fr 1fr;gap:20px;}
+.card{background:#fff;border-radius:16px;padding:24px;box-shadow:0 2px 12px rgba(0,0,0,.06);}
+.ch{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;}
+.ct{font-size:1.05rem;font-weight:700;color:#1e3d1a;display:flex;align-items:center;gap:8px;}
+.btn-sm{padding:6px 16px;background:#4CAF50;color:#fff;border:none;border-radius:20px;font-size:.82rem;cursor:pointer;text-decoration:none;transition:all .2s;}
+.btn-sm:hover{background:#2d5a27;}
+/* Quick links */
+.qlinks{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+.ql{display:flex;flex-direction:column;align-items:center;gap:8px;padding:20px 12px;background:#fff;border-radius:14px;text-decoration:none;color:#333;box-shadow:0 2px 10px rgba(0,0,0,.05);transition:all .3s;text-align:center;}
+.ql:hover{transform:translateY(-4px);box-shadow:0 8px 24px rgba(0,0,0,.1);}
+.ql i{font-size:1.8rem;}
+.ql.g i{color:#16a34a;} .ql.b i{color:#2563eb;} .ql.o i{color:#d97706;}
+.ql.p i{color:#7c3aed;} .ql.r i{color:#dc2626;} .ql.t i{color:#0891b2;}
+.ql span{font-size:.82rem;font-weight:600;}
+/* Harga table */
+.ht{width:100%;border-collapse:collapse;}
+.ht td{padding:10px 0;border-bottom:1px solid #f3f4f6;font-size:.88rem;}
+.ht tr:last-child td{border-bottom:none;}
+.harga-val{font-weight:700;color:#2d5a27;}
+.plus{color:#16a34a;font-size:.75rem;} .minus{color:#dc2626;font-size:.75rem;}
+/* Hama list */
+.hama-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid #f3f4f6;font-size:.85rem;}
+.hama-item:last-child{border-bottom:none;}
+.hd{width:4px;height:40px;border-radius:4px;flex-shrink:0;}
+.kritis{background:#dc2626;} .berat{background:#ef4444;} .sedang{background:#f59e0b;} .ringan{background:#22c55e;}
+.hama-info{flex:1;min-width:0;}
+.hama-name{font-weight:600;color:#1a1a1a;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.hama-meta{color:#999;font-size:.75rem;margin-top:2px;}
+.hbadge{padding:2px 8px;border-radius:8px;font-size:.7rem;font-weight:700;flex-shrink:0;}
+.hbk{background:#fee2e2;color:#dc2626;} .hbb{background:#fee2e2;color:#ef4444;}
+.hbs{background:#fef3c7;color:#d97706;} .hbr{background:#dcfce7;color:#16a34a;}
+@media(max-width:1200px){.stats{grid-template-columns:repeat(2,1fr);}.grid2{grid-template-columns:1fr;}.qlinks{grid-template-columns:repeat(3,1fr);}}
+@media(max-width:1024px){.mc{margin-left:0;padding:16px;}}
+@media(max-width:600px){.qlinks{grid-template-columns:repeat(2,1fr);}.stats{grid-template-columns:repeat(2,1fr);}}
+</style>
+</head>
+<body>
+<%- include('partials/sidebar', { active: 'dashboard' }) %>
+<main class="mc">
+  <div class="header">
+    <div class="header-left">
+      <h1>🌾 Dashboard Sinar Tani</h1>
+      <p><% if(user){%>Selamat datang kembali, <strong><%= user.nama %></strong>!<%}else{%>Selamat datang di platform pertanian digital Indonesia.<%}%></p>
+    </div>
+    <% if(user){ %><div class="user-chip"><div class="ua"><%= user.nama.charAt(0).toUpperCase() %></div><span style="font-size:.88rem;color:#666;font-weight:600;"><%= user.nama.split(' ')[0] %></span></div><% } %>
+  </div>
+
+  <!-- Stats -->
+  <div class="stats">
+    <div class="sc"><div class="sc-top"><div><div class="sv" id="statPetani">—</div><div class="sl">Total Pengguna</div></div><div class="si g"><i class="fas fa-users"></i></div></div><div class="stag" style="color:#16a34a;"><i class="fas fa-seedling"></i> Terdaftar di platform</div></div>
+    <div class="sc"><div class="sc-top"><div><div class="sv" id="statProduk">—</div><div class="sl">Produk di Pasar</div></div><div class="si b"><i class="fas fa-store"></i></div></div><div class="stag" style="color:#2563eb;"><i class="fas fa-box"></i> Produk aktif dijual</div></div>
+    <div class="sc" style="cursor:pointer;" onclick="window.location='/k-map'"><div class="sc-top"><div><div class="sv" id="statHama">—</div><div class="sl">Serangan Hama Aktif</div></div><div class="si o"><i class="fas fa-bug"></i></div></div><div class="stag" id="hamaTag" style="color:#d97706;"><i class="fas fa-satellite-dish"></i> Klik untuk lihat radar</div></div>
+    <div class="sc"><div class="sc-top"><div><div class="sv" id="statBantuan">—</div><div class="sl">Program Bantuan</div></div><div class="si r"><i class="fas fa-hands-helping"></i></div></div><div class="stag" style="color:#dc2626;"><i class="fas fa-landmark"></i> Dari dinas pertanian</div></div>
+  </div>
+
+  <!-- Hama alert banner -->
+  <div class="hama-banner" id="hamaBanner">
+    <div class="hb-icon">⚠️</div>
+    <div class="hb-text"><h4>Peringatan Serangan Hama</h4><p id="hamaMsg">Terdeteksi serangan hama kritis — segera periksa Radar Hama</p></div>
+    <a href="/k-map" class="hb-btn"><i class="fas fa-map-marked-alt"></i> Buka Radar</a>
+  </div>
+
+  <!-- Quick links -->
+  <div class="qlinks">
+    <a href="/k-map"          class="ql r"><i class="fas fa-satellite-dish"></i><span>Radar Hama</span></a>
+    <a href="/pasar-tani"     class="ql g"><i class="fas fa-store"></i><span>Pasar Tani</span></a>
+    <a href="/kalkulator-tani"class="ql b"><i class="fas fa-calculator"></i><span>Kalkulator</span></a>
+    <a href="/kelas-tani"     class="ql p"><i class="fas fa-graduation-cap"></i><span>Kelas Tani</span></a>
+    <a href="/bantuan-dinas"  class="ql o"><i class="fas fa-hands-helping"></i><span>Bantuan Dinas</span></a>
+    <a href="/profil"         class="ql t"><i class="fas fa-user-circle"></i><span>Profil Saya</span></a>
+  </div>
+
+  <!-- Content grid -->
+  <div class="grid2">
+    <div class="card">
+      <div class="ch"><div class="ct"><i class="fas fa-chart-line" style="color:#2563eb;"></i> Harga Komoditas</div><a href="#" class="btn-sm" onclick="loadHarga()">Refresh</a></div>
+      <table class="ht" id="hargaTable"><tr><td style="text-align:center;color:#999;padding:24px;">Memuat data harga...</td></tr></table>
+    </div>
+    <div class="card">
+      <div class="ch"><div class="ct"><i class="fas fa-broadcast-tower" style="color:#dc2626;"></i> Radar Hama</div><a href="/k-map" class="btn-sm">Lihat Peta</a></div>
+      <div id="hamaList"><div style="text-align:center;color:#999;padding:20px;">Memuat data...</div></div>
+    </div>
+  </div>
+</main>
+
+<script>
+// Animate counter function
+function animateCounter(elementId, target, duration = 1000) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  const start = 0;
+  const increment = target >= 1000 ? Math.ceil(target / 50) : 1;
+  let current = start;
+  const stepTime = duration / (target / increment);
+  
+  const timer = setInterval(() => {
+    current += increment;
+    if (current >= target) {
+      current = target;
+      clearInterval(timer);
+    }
+    el.textContent = current.toLocaleString();
+  }, stepTime);
+}
+
+async function loadStats() {
+  try {
+    const r = await fetch('/api/statistik');
+    const j = await r.json();
+    if (!j.sukses) return;
+    const d = j.data;
+    
+    // Animate stats
+    animateCounter('statPetani', d.total_petani || 0);
+    animateCounter('statProduk', d.total_produk || 0);
+    animateCounter('statHama', d.hama_aktif || 0);
+    animateCounter('statBantuan', d.total_bantuan || 0);
+    
+    if (d.hama_kritis > 0) {
+      document.getElementById('hamaBanner').style.display = 'flex';
+      document.getElementById('hamaMsg').textContent = d.hama_kritis + ' serangan KRITIS terdeteksi di berbagai wilayah!';
+      document.getElementById('hamaTag').innerHTML = '<i class="fas fa-skull-crossbones"></i> ' + d.hama_kritis + ' serangan KRITIS!';
+      document.getElementById('hamaTag').style.color = '#dc2626';
+    }
+  } catch (err) {
+    console.error('Failed to load stats:', err);
+    document.getElementById('statPetani').textContent = '—';
+    document.getElementById('statProduk').textContent = '—';
+    document.getElementById('statHama').textContent = '—';
+    document.getElementById('statBantuan').textContent = '—';
+  }
+}
+
+async function loadHarga() {
+  try {
+    const r = await fetch('/api/harga/terkini');
+    const j = await r.json();
+    const tbl = document.getElementById('hargaTable');
+    
+    if (!j.sukses) {
+      tbl.innerHTML = '<tr><td style="color:#ef4444;text-align:center;padding:20px;">Gagal memuat data harga.</td></tr>';
+      return;
+    }
+    
+    if (!j.data.length) {
+      tbl.innerHTML = '<tr><td style="color:#999;text-align:center;padding:20px;"><i class="fas fa-info-circle"></i> Data tidak tersedia</td></tr>';
+      return;
+    }
+    
+    tbl.innerHTML = j.data.slice(0,8).map(h => `
+      <tr>
+        <td><strong>${h.nama}</strong><br><span style="font-size:.75rem;color:#999;">${h.satuan||'kg'}</span></td>
+        <td class="harga-val">Rp ${Number(h.harga).toLocaleString('id-ID')}</td>
+        <td>${(h.perubahan||0) >= 0 ? '<span class="plus">▲ '+Math.abs(h.perubahan||0)+'%</span>' : '<span class="minus">▼ '+Math.abs(h.perubahan||0)+'%</span>'}</td>
+      </tr>`).join('');
+  } catch (err) {
+    console.error('Failed to load prices:', err);
+    document.getElementById('hargaTable').innerHTML = '<tr><td style="color:#ef4444;text-align:center;padding:20px;"><i class="fas fa-exclamation-triangle"></i> Gagal memuat harga</td></tr>';
+  }
+}
+
+async function loadHama() {
+  try {
+    const r = await fetch('/api/hama?limit=5&status=aktif');
+    const j = await r.json();
+    const container = document.getElementById('hamaList');
+    
+    if (!j.sukses) {
+      container.innerHTML = '<div style="text-align:center;color:#ef4444;padding:16px;"><i class="fas fa-exclamation-triangle"></i><br><small>Gagal memuat data</small></div>';
+      return;
+    }
+    
+    if (!j.data.length) {
+      container.innerHTML = '<div style="text-align:center;color:#22c55e;padding:16px;"><i class="fas fa-check-circle" style="font-size:1.5rem;"></i><br><small>Tidak ada hama aktif</small></div>';
+      return;
+    }
+    
+    container.innerHTML = j.data.map(h => `
+      <div class="hama-item">
+        <div class="hd ${h.tingkat_serangan}"></div>
+        <div class="hama-info">
+          <div class="hama-name">${h.jenis_hama}</div>
+          <div class="hama-meta">${h.komoditas_terdampak} · ${h.kabupaten||h.provinsi||'—'}</div>
+        </div>
+        <span class="hbadge hb${h.tingkat_serangan.charAt(0)}">${h.tingkat_serangan}</span>
+      </div>`).join('');
+  } catch (err) {
+    console.error('Failed to load hama:', err);
+    document.getElementById('hamaList').innerHTML = '<div style="text-align:center;color:#ef4444;padding:16px;"><i class="fas fa-exclamation-triangle"></i><br><small>Gagal memuat data</small></div>';
+  }
+}
+
+// Load all data on page load
+document.addEventListener('DOMContentLoaded', () => {
+  loadStats();
+  loadHarga();
+  loadHama();
+});
+</script>
+</body>
+</html>

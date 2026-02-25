@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>K-MAP & Radar Hama — Sinar Tani</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+    :root {
+        --g900:#1e3d1a;--g700:#2d5a27;--g500:#4CAF50;--g300:#81c784;
+        --amber:#f59e0b;--red:#ef4444;--red2:#dc2626;--blue:#3b82f6;
+        --bg:#f0f4f0;--card:#fff;--shadow:0 4px 24px rgba(0,0,0,.08);--r:16px;
+        --rb:#0a1628;--rc:#0f1f35;--rborder:rgba(99,161,255,.15);
+    }
+    *{margin:0;padding:0;box-sizing:border-box;}
+    body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:#333;}
+    .sidebar{position:fixed;left:0;top:0;width:260px;height:100vh;background:linear-gradient(180deg,var(--g700),var(--g900));color:#fff;padding:20px;overflow-y:auto;z-index:1000;}
+    .sidebar-header{text-align:center;padding:20px 0;border-bottom:1px solid rgba(255,255,255,.1);}
+    .sidebar-header h2{font-size:1.5rem;display:flex;align-items:center;justify-content:center;gap:10px;}
+    .sidebar-menu{list-style:none;margin-top:30px;}
+    .sidebar-menu li{margin-bottom:10px;}
+    .sidebar-menu a{display:flex;align-items:center;gap:12px;padding:12px 15px;color:rgba(255,255,255,.8);text-decoration:none;border-radius:10px;transition:all .3s;}
+    .sidebar-menu a:hover,.sidebar-menu a.active{background:rgba(255,255,255,.1);color:#fff;transform:translateX(5px);}
+    .mc{margin-left:260px;padding:24px;min-height:100vh;}
+    .ph{background:#fff;border-radius:var(--r);padding:20px 28px;box-shadow:var(--shadow);margin-bottom:24px;display:flex;justify-content:space-between;align-items:center;}
+    .ph h1{color:var(--g700);font-size:1.7rem;display:flex;align-items:center;gap:12px;}
+    .stats-row{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+    .sc{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--shadow);display:flex;align-items:center;gap:16px;position:relative;overflow:hidden;transition:transform .3s;}
+    .sc:hover{transform:translateY(-3px);}
+    .sc::before{content:'';position:absolute;right:-20px;top:-20px;width:80px;height:80px;border-radius:50%;opacity:.08;}
+    .sc.green::before{background:var(--g500);}
+    .sc.amber::before{background:var(--amber);}
+    .sc.red::before{background:var(--red);}
+    .sc.blue::before{background:var(--blue);}
+    .sico{width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.4rem;flex-shrink:0;}
+    .sc.green .sico{background:#dcfce7;color:var(--g500);}
+    .sc.amber .sico{background:#fef3c7;color:var(--amber);}
+    .sc.red   .sico{background:#fee2e2;color:var(--red);}
+    .sc.blue  .sico{background:#dbeafe;color:var(--blue);}
+    .sval{font-size:2rem;font-weight:700;color:#1a1a1a;line-height:1;}
+    .slbl{font-size:.82rem;color:#888;margin-top:4px;}
+    .sp{position:absolute;right:16px;top:16px;width:10px;height:10px;border-radius:50%;}
+    .sc.red  .sp{background:var(--red);animation:pr 1.5s infinite;}
+    .sc.amber .sp{background:var(--amber);animation:pa 2s infinite;}
+    @keyframes pr{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5);}50%{box-shadow:0 0 0 8px rgba(239,68,68,0);}}
+    @keyframes pa{0%,100%{box-shadow:0 0 0 0 rgba(245,158,11,.5);}50%{box-shadow:0 0 0 8px rgba(245,158,11,0);}}
+    .grid2{display:grid;grid-template-columns:1fr 380px;gap:20px;}
+    .mwrap{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden;}
+    .mtbar{padding:14px 20px;display:flex;gap:10px;flex-wrap:wrap;align-items:center;border-bottom:1px solid #f3f4f6;}
+    .chip{padding:7px 16px;border:1.5px solid #e5e7eb;background:#fff;border-radius:20px;font-size:.85rem;cursor:pointer;transition:all .2s;color:#555;font-weight:500;}
+    .chip.on{background:var(--g700);border-color:var(--g700);color:#fff;}
+    .chip:hover:not(.on){border-color:var(--g500);}
+    select.chip{appearance:none;padding-right:28px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;}
+    #map{height:500px;}
+    .leg{display:flex;gap:20px;flex-wrap:wrap;padding:12px 20px;border-top:1px solid #f3f4f6;}
+    .li{display:flex;align-items:center;gap:7px;font-size:.82rem;color:#555;}
+    .ld{width:12px;height:12px;border-radius:50%;}
+    .rpanel{background:var(--rb);border-radius:var(--r);overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,.4);}
+    .rh{padding:18px 20px;border-bottom:1px solid var(--rborder);display:flex;align-items:center;gap:12px;}
+    .rdot{width:10px;height:10px;border-radius:50%;background:var(--red);animation:pr 1.2s infinite;}
+    .rh h3{color:#e2e8f0;font-size:1rem;font-weight:600;}
+    .rlive{color:#ef4444;font-size:.7rem;font-weight:700;letter-spacing:.08em;margin-left:auto;}
+    .rlist{max-height:440px;overflow-y:auto;padding:12px;}
+    .rlist::-webkit-scrollbar{width:4px;}
+    .rlist::-webkit-scrollbar-track{background:var(--rc);}
+    .rlist::-webkit-scrollbar-thumb{background:#334155;border-radius:2px;}
+    .ri{background:var(--rc);border:1px solid var(--rborder);border-radius:12px;padding:14px;margin-bottom:10px;cursor:pointer;transition:all .25s;position:relative;overflow:hidden;}
+    .ri::before{content:'';position:absolute;left:0;top:0;bottom:0;width:4px;border-radius:4px 0 0 4px;}
+    .ri.kritis::before{background:var(--red2);}
+    .ri.berat::before{background:var(--red);}
+    .ri.sedang::before{background:var(--amber);}
+    .ri.ringan::before{background:var(--g500);}
+    .ri:hover{border-color:rgba(99,161,255,.4);transform:translateX(3px);}
+    @keyframes sli{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+    .ri{animation:sli .4s ease both;}
+    .ri-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;}
+    .ri-name{color:#e2e8f0;font-weight:600;font-size:.92rem;}
+    .rbadge{padding:3px 10px;border-radius:20px;font-size:.72rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+    .bk{background:rgba(220,38,38,.2);color:#fca5a5;border:1px solid rgba(220,38,38,.3);}
+    .bb{background:rgba(239,68,68,.2);color:#fca5a5;border:1px solid rgba(239,68,68,.3);}
+    .bs{background:rgba(245,158,11,.2);color:#fcd34d;border:1px solid rgba(245,158,11,.3);}
+    .br{background:rgba(76,175,80,.2); color:#86efac;border:1px solid rgba(76,175,80,.3);}
+    .ri-meta{display:flex;gap:10px;flex-wrap:wrap;}
+    .rm{font-size:.76rem;color:#64748b;display:flex;align-items:center;gap:4px;}
+    .rm.kom{color:#93c5fd;}.rm.lok{color:#a78bfa;}.rm.pel{color:#6ee7b7;}
+    .rv{font-size:.68rem;color:#10b981;margin-top:6px;display:flex;align-items:center;gap:4px;}
+    .ruv{font-size:.68rem;color:#64748b;margin-top:6px;display:flex;align-items:center;gap:4px;}
+    .lsec{background:#fff;border-radius:var(--r);padding:24px;box-shadow:var(--shadow);margin-top:20px;}
+    .lhd{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;}
+    .lhd h3{color:var(--g700);font-size:1.1rem;display:flex;align-items:center;gap:8px;}
+    .fg{margin-bottom:14px;}
+    .fg label{display:block;margin-bottom:5px;font-size:.84rem;font-weight:600;color:#555;}
+    .fg input,.fg select,.fg textarea{width:100%;padding:10px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:.9rem;font-family:inherit;transition:all .2s;background:#fafafa;}
+    .fg input:focus,.fg select:focus,.fg textarea:focus{outline:none;border-color:var(--g500);box-shadow:0 0 0 3px rgba(76,175,80,.12);background:#fff;}
+    .fg2{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+    .ffc{grid-column:1/-1;}
+    .sevrow{display:flex;gap:8px;}
+    .so{flex:1;position:relative;}
+    .so input[type=radio]{position:absolute;opacity:0;}
+    .sl{display:block;padding:9px 6px;text-align:center;border:2px solid #e5e7eb;border-radius:10px;cursor:pointer;transition:all .2s;font-size:.8rem;font-weight:600;}
+    .so.ringan input:checked+.sl{background:var(--g500);border-color:var(--g500);color:#fff;}
+    .so.sedang input:checked+.sl{background:var(--amber);border-color:var(--amber);color:#fff;}
+    .so.berat  input:checked+.sl{background:var(--red);border-color:var(--red);color:#fff;}
+    .so.kritis input:checked+.sl{background:var(--red2);border-color:var(--red2);color:#fff;}
+    .so.ringan .sl:hover{border-color:var(--g500);}
+    .so.sedang .sl:hover{border-color:var(--amber);}
+    .so.berat  .sl:hover{border-color:var(--red);}
+    .so.kritis .sl:hover{border-color:var(--red2);}
+    .crow{display:flex;gap:10px;align-items:flex-end;}
+    .bgps{padding:10px 16px;background:var(--blue);color:#fff;border:none;border-radius:10px;cursor:pointer;font-size:.85rem;white-space:nowrap;transition:all .2s;display:flex;align-items:center;gap:6px;}
+    .bgps:hover{background:#2563eb;}
+    .bsub{width:100%;padding:14px;margin-top:8px;background:linear-gradient(135deg,var(--g700),var(--g500));color:#fff;border:none;border-radius:12px;font-size:1rem;font-weight:700;cursor:pointer;transition:all .3s;display:flex;align-items:center;justify-content:center;gap:8px;}
+    .bsub:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(45,90,39,.4);}
+    .toast{position:fixed;bottom:28px;right:28px;z-index:9999;padding:14px 22px;border-radius:12px;color:#fff;font-weight:600;box-shadow:0 8px 30px rgba(0,0,0,.25);transform:translateY(80px);opacity:0;transition:all .4s cubic-bezier(.34,1.56,.64,1);pointer-events:none;display:flex;align-items:center;gap:10px;max-width:320px;}
+    .toast.show{transform:translateY(0);opacity:1;}
+    .toast.success{background:linear-gradient(135deg,#059669,#10b981);}
+    .toast.error{background:linear-gradient(135deg,#dc2626,#ef4444);}
+    .hcard{background:#fff;border-radius:var(--r);padding:20px;box-shadow:var(--shadow);margin-top:20px;}
+    .htitle{color:var(--g700);font-size:1rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+    .hr{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid #f3f4f6;}
+    .hr:last-child{border-bottom:none;}
+    .hrk{width:28px;height:28px;border-radius:50%;background:var(--g700);color:#fff;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:700;flex-shrink:0;}
+    .hrk.d{background:var(--red);}
+    .hri{flex:1;}
+    .hrn{font-weight:600;font-size:.9rem;}
+    .hrc{font-size:.78rem;color:#888;}
+    .hrb{height:5px;background:#f3f4f6;border-radius:3px;margin-top:5px;overflow:hidden;}
+    .hrf{height:100%;background:linear-gradient(90deg,var(--g500),var(--g300));border-radius:3px;transition:width 1s;}
+    .hr.d .hrf{background:linear-gradient(90deg,var(--red),#fca5a5);}
+    .lp{background:linear-gradient(135deg,#fef3c7,#fff7ed);border:2px solid #fbbf24;border-radius:12px;padding:20px;text-align:center;margin-top:20px;}
+    .lp p{color:#92400e;margin-bottom:12px;font-weight:500;}
+    .lpa{display:inline-flex;align-items:center;gap:8px;padding:10px 24px;background:#f59e0b;color:#fff;border-radius:25px;text-decoration:none;font-weight:700;transition:all .3s;}
+    .lpa:hover{background:#d97706;transform:translateY(-2px);}
+    @media(max-width:1300px){.grid2{grid-template-columns:1fr;}}
+    @media(max-width:1024px){.sidebar{transform:translateX(-100%);}.mc{margin-left:0;}.stats-row{grid-template-columns:repeat(2,1fr);}.fg2{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+<%- include('partials/sidebar', { active: 'k-map' }) %>
+<main class="mc">
+
+<div class="ph">
+    <h1><i class="fas fa-satellite-dish" style="color:var(--g500);"></i> K-MAP &amp; Radar Hama</h1>
+    <div style="font-size:.85rem;color:#888;">Data laporan serangan hama real-time dari lapangan</div>
+</div>
+
+<div class="stats-row">
+    <div class="sc green"><div class="sico"><i class="fas fa-map-marker-alt"></i></div><div><div class="sval" id="sLok">—</div><div class="slbl">Titik Terpantau</div></div></div>
+    <div class="sc amber"><div class="sp"></div><div class="sico"><i class="fas fa-exclamation-triangle"></i></div><div><div class="sval" id="sAkt">—</div><div class="slbl">Serangan Aktif</div></div></div>
+    <div class="sc red"><div class="sp"></div><div class="sico"><i class="fas fa-skull-crossbones"></i></div><div><div class="sval" id="sKri">—</div><div class="slbl">Status Kritis</div></div></div>
+    <div class="sc blue"><div class="sico"><i class="fas fa-file-alt"></i></div><div><div class="sval" id="sTot">—</div><div class="slbl">Total Laporan</div></div></div>
+</div>
+
+<div class="grid2">
+    <div>
+        <div class="mwrap">
+            <div class="mtbar">
+                <button class="chip on" onclick="setFT('all',this)">Semua</button>
+                <button class="chip" onclick="setFT('kritis',this)" style="color:#ef4444;">⬤ Kritis</button>
+                <button class="chip" onclick="setFT('berat',this)" style="color:#f97316;">⬤ Berat</button>
+                <button class="chip" onclick="setFT('sedang',this)" style="color:#f59e0b;">⬤ Sedang</button>
+                <button class="chip" onclick="setFT('ringan',this)" style="color:#22c55e;">⬤ Ringan</button>
+                <select class="chip" id="fkh" onchange="applyF()">
+                    <option value="all">Semua Jenis</option>
+                    <option value="serangga">🦗 Serangga</option>
+                    <option value="tikus">🐀 Tikus</option>
+                    <option value="jamur">🍄 Jamur</option>
+                    <option value="bakteri">🦠 Bakteri</option>
+                    <option value="virus">🧬 Virus</option>
+                    <option value="lainnya">Lainnya</option>
+                </select>
+            </div>
+            <div id="map"></div>
+            <div class="leg">
+                <div class="li"><div class="ld" style="background:#dc2626;box-shadow:0 0 6px #dc2626;"></div>Kritis</div>
+                <div class="li"><div class="ld" style="background:#ef4444;"></div>Berat</div>
+                <div class="li"><div class="ld" style="background:#f59e0b;"></div>Sedang</div>
+                <div class="li"><div class="ld" style="background:#22c55e;"></div>Ringan</div>
+                <div class="li"><div class="ld" style="background:#a3a3a3;"></div>Ditangani</div>
+                <div class="li"><div class="ld" style="border:2px solid #22c55e;background:transparent;"></div>Terverifikasi</div>
+            </div>
+        </div>
+        <div class="hcard">
+            <div class="htitle"><i class="fas fa-fire" style="color:#ef4444;"></i> Hotspot Serangan per Wilayah</div>
+            <div id="hsList"><div style="color:#999;text-align:center;padding:10px;">Memuat...</div></div>
+        </div>
+    </div>
+
+    <div>
+        <div class="rpanel">
+            <div class="rh">
+                <div class="rdot"></div>
+                <h3>RADAR HAMA AKTIF</h3>
+                <span class="rlive">● LIVE</span>
+            </div>
+            <div class="rlist" id="rList">
+                <div style="color:#475569;text-align:center;padding:30px;"><i class="fas fa-spinner fa-spin" style="font-size:1.5rem;margin-bottom:10px;display:block;"></i>Memuat data...</div>
+            </div>
+        </div>
+
+        <% if (user) { %>
+        <div class="lsec">
+            <div class="lhd">
+                <h3><i class="fas fa-plus-circle" style="color:var(--red);"></i> Laporkan Serangan Hama</h3>
+                <% if (user.peran === 'kader' || user.peran === 'admin') { %>
+                <span style="font-size:.75rem;background:#dcfce7;color:#166534;padding:4px 10px;border-radius:20px;font-weight:600;"><i class="fas fa-check-circle"></i> Auto-Verified</span>
+                <% } %>
+            </div>
+            <div class="fg2">
+                <div class="fg">
+                    <label>Jenis Hama *</label>
+                    <input type="text" id="fJH" placeholder="Wereng, Tikus, Ulat Grayak..." list="hList">
+                    <datalist id="hList"><option value="Wereng Batang Coklat"><option value="Tikus Sawah"><option value="Ulat Grayak"><option value="Penggerek Batang Padi"><option value="Lalat Buah"><option value="Kutu Daun"><option value="Belalang"><option value="Busuk Daun (Phytophthora)"><option value="Hawar Daun Bakteri"><option value="Tungro (Virus Padi)"></datalist>
+                </div>
+                <div class="fg">
+                    <label>Kategori</label>
+                    <select id="fKat"><option value="serangga">🦗 Serangga</option><option value="tikus">🐀 Tikus</option><option value="jamur">🍄 Jamur</option><option value="bakteri">🦠 Bakteri</option><option value="virus">🧬 Virus</option><option value="lainnya">Lainnya</option></select>
+                </div>
+                <div class="fg ffc">
+                    <label>Tingkat Serangan *</label>
+                    <div class="sevrow">
+                        <div class="so ringan"><input type="radio" name="tkt" id="sr" value="ringan" checked><label class="sl" for="sr">🟢 Ringan</label></div>
+                        <div class="so sedang"><input type="radio" name="tkt" id="ss" value="sedang"><label class="sl" for="ss">🟡 Sedang</label></div>
+                        <div class="so berat"><input type="radio" name="tkt" id="sb" value="berat"><label class="sl" for="sb">🔴 Berat</label></div>
+                        <div class="so kritis"><input type="radio" name="tkt" id="sk" value="kritis"><label class="sl" for="sk">🚨 Kritis</label></div>
+                    </div>
+                </div>
+                <div class="fg"><label>Komoditas Terdampak *</label><input type="text" id="fKom" placeholder="Padi, Jagung, Cabai..." list="kList"><datalist id="kList"><option value="Padi"><option value="Jagung"><option value="Kedelai"><option value="Cabai"><option value="Bawang Merah"><option value="Kentang"><option value="Tomat"><option value="Mangga"></datalist></div>
+                <div class="fg"><label>Luas Terdampak (ha)</label><input type="number" id="fLuas" placeholder="1.5" step="0.1" min="0"></div>
+                <div class="fg"><label>Provinsi *</label><input type="text" id="fProv" placeholder="Jawa Barat" value="<%= user.provinsi||'' %>"></div>
+                <div class="fg"><label>Kabupaten/Kota</label><input type="text" id="fKab" placeholder="Bandung" value="<%= user.kabupaten||'' %>"></div>
+                <div class="fg ffc"><label>Kecamatan / Desa</label><input type="text" id="fKec" placeholder="Kecamatan / desa lokasi serangan"></div>
+                <div class="fg ffc"><label>Deskripsi Serangan</label><textarea id="fDesc" rows="2" placeholder="Gejala tanaman, kondisi serangan, estimasi kerugian..."></textarea></div>
+                <div class="fg ffc">
+                    <label>Koordinat GPS (opsional — untuk tampil di peta)</label>
+                    <div class="crow">
+                        <input type="number" id="fLat" placeholder="Latitude" step="0.0001" style="flex:1;">
+                        <input type="number" id="fLng" placeholder="Longitude" step="0.0001" style="flex:1;">
+                        <button class="bgps" onclick="getGPS()"><i class="fas fa-crosshairs"></i> Lokasi Saya</button>
+                    </div>
+                </div>
+            </div>
+            <div id="fErr" style="display:none;background:#fee2e2;border-left:4px solid #ef4444;padding:10px 14px;border-radius:8px;color:#991b1b;font-size:.85rem;margin-top:10px;"></div>
+            <button class="bsub" onclick="submitL()"><i class="fas fa-paper-plane"></i> Kirim Laporan Serangan</button>
+        </div>
+        <% } else { %>
+        <div class="lp">
+            <p><i class="fas fa-lock"></i> Login untuk melaporkan serangan hama di wilayah Anda</p>
+            <a href="/auth/login?redirect=/k-map" class="lpa"><i class="fas fa-sign-in-alt"></i> Login Sekarang</a>
+        </div>
+        <% } %>
+    </div>
+</div>
+</main>
+
+<div class="toast" id="toast"><i></i><span id="tMsg"></span></div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let map, allL=[], allM=[], fTkt='all', fKat='all';
+const TC={kritis:'#dc2626',berat:'#ef4444',sedang:'#f59e0b',ringan:'#22c55e',ditangani:'#a3a3a3'};
+const TS={kritis:18,berat:14,sedang:12,ringan:10,ditangani:9};
+const KI={serangga:'🦗',tikus:'🐀',jamur:'🍄',bakteri:'🦠',virus:'🧬',lainnya:'⚠️'};
+
+function initMap(){
+    map=L.map('map').setView([-7.0,110.0],6);
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',{attribution:'&copy; OpenStreetMap &copy; CARTO',maxZoom:19}).addTo(map);
+    loadPeta(); loadRadar(); loadStats();
+}
+
+async function loadPeta(){
+    try{const r=await fetch('/api/hama/peta');const j=await r.json();allL=j.sukses?j.data:[];renderM();}catch(e){}
+}
+
+function renderM(){
+    allM.forEach(({m,c})=>{map.removeLayer(m);if(c)map.removeLayer(c);});
+    allM=[];
+    const fl=allL.filter(l=>{const ot=fTkt==='all'||l.tingkat_serangan===fTkt;const ok=fKat==='all'||l.kategori_hama===fKat;return ot&&ok;});
+    fl.forEach((l,i)=>{
+        if(!l.latitude||!l.longitude)return;
+        const st=l.status==='ditangani'?'ditangani':l.tingkat_serangan;
+        const col=TC[st]||'#888',sz=TS[st]||10;
+        const m=L.circleMarker([l.latitude,l.longitude],{radius:sz,fillColor:col,color:l.verified?'#22c55e':'#fff',weight:l.verified?2.5:2,opacity:1,fillOpacity:l.status==='ditangani'?.5:.9}).addTo(map);
+        let c=null;
+        if(l.tingkat_serangan==='kritis'&&l.status==='aktif'){c=L.circleMarker([l.latitude,l.longitude],{radius:sz+10,fillColor:'transparent',color:col,weight:1.5,opacity:.5}).addTo(map);}
+        const hr=Math.floor((Date.now()-new Date(l.created_at))/86400000);
+        m.bindPopup(`<div style="font-family:'Segoe UI',sans-serif;min-width:200px;"><div style="font-weight:700;font-size:.95rem;margin-bottom:6px;">${KI[l.kategori_hama]||'⚠️'} ${l.jenis_hama}</div><span style="display:inline-block;padding:2px 10px;border-radius:12px;font-size:.75rem;font-weight:700;margin-bottom:8px;background:${col}22;color:${col};border:1px solid ${col}44;">${l.tingkat_serangan.toUpperCase()}</span><div style="font-size:.82rem;color:#555;margin-bottom:3px;"><strong>Komoditas:</strong> ${l.komoditas_terdampak}</div><div style="font-size:.82rem;color:#555;margin-bottom:3px;"><strong>Lokasi:</strong> ${l.kabupaten||''}${l.kabupaten&&l.kecamatan?', ':''}${l.kecamatan||''}, ${l.provinsi}</div>${l.luas_terdampak?`<div style="font-size:.82rem;color:#555;margin-bottom:3px;"><strong>Luas:</strong> ${l.luas_terdampak} ha</div>`:''}<div style="font-size:.82rem;color:#555;margin-bottom:3px;"><strong>Pelapor:</strong> ${l.pelapor} (${l.peran_pelapor})</div><div style="font-size:.78rem;color:#888;">${hr===0?'Hari ini':hr+' hari lalu'} · Status: ${l.status}</div>${l.verified?'<div style="color:#16a34a;font-size:.78rem;margin-top:4px;">✓ Terverifikasi</div>':''}</div>`,{maxWidth:250});
+        allM.push({m,c});
+    });
+}
+
+async function loadRadar(){
+    try{
+        const r=await fetch('/api/hama?status=aktif&limit=30');const j=await r.json();
+        const el=document.getElementById('rList');
+        if(!j.sukses||!j.data.length){el.innerHTML='<div style="color:#475569;text-align:center;padding:30px;"><i class="fas fa-check-circle" style="font-size:2rem;color:#22c55e;display:block;margin-bottom:10px;"></i>Tidak ada serangan aktif</div>';return;}
+        el.innerHTML=j.data.map((l,i)=>{
+            const hr=Math.floor((Date.now()-new Date(l.created_at))/86400000);
+            const bc={kritis:'bk',berat:'bb',sedang:'bs',ringan:'br'}[l.tingkat_serangan]||'br';
+            return `<div class="ri ${l.tingkat_serangan}" style="animation-delay:${i*50}ms;" onclick="focM(${l.latitude},${l.longitude})">
+                <div class="ri-top"><div class="ri-name">${KI[l.kategori_hama]||'⚠️'} ${l.jenis_hama}</div><span class="rbadge ${bc}">${l.tingkat_serangan}</span></div>
+                <div class="ri-meta">
+                    <span class="rm kom"><i class="fas fa-seedling"></i>${l.komoditas_terdampak}</span>
+                    <span class="rm lok"><i class="fas fa-map-pin"></i>${l.kabupaten||l.provinsi}</span>
+                    <span class="rm pel"><i class="fas fa-user"></i>${l.nama_pelapor||'Anonim'}</span>
+                </div>
+                <div class="${l.verified?'rv':'ruv'}"><i class="fas fa-${l.verified?'check-circle':'clock'}"></i>${l.verified?'Terverifikasi':'Menunggu verifikasi'} · ${hr===0?'Hari ini':hr+' hari lalu'}${l.luas_terdampak?` · ${l.luas_terdampak} ha`:''}</div>
+            </div>`;
+        }).join('');
+    }catch(e){}
+}
+
+async function loadStats(){
+    try{
+        const r=await fetch('/api/hama/statistik');const j=await r.json();
+        if(!j.sukses)return;const d=j.data;
+        animC('sLok',allL.length||d.total_laporan);animC('sAkt',d.total_aktif);animC('sKri',d.total_kritis);animC('sTot',d.total_laporan);
+        const hs=document.getElementById('hsList');const mx=d.hotspot_provinsi[0]?.total||1;
+        hs.innerHTML=d.hotspot_provinsi.map((h,i)=>`<div class="hr ${h.total>=3?'d':''}"><div class="hrk ${h.total>=3?'d':''}">${i+1}</div><div class="hri"><div class="hrn">${h.provinsi}</div><div class="hrc">${h.total} laporan aktif</div><div class="hrb"><div class="hrf" style="width:${(h.total/mx)*100}%"></div></div></div><span style="font-size:.8rem;font-weight:700;color:${h.total>=3?'#ef4444':'#22c55e'};">${h.total}</span></div>`).join('');
+    }catch(e){}
+}
+
+function animC(id,tgt){const el=document.getElementById(id);if(!el)return;if(!tgt){el.textContent=0;return;}let c=0;const st=Math.max(1,Math.floor(tgt/20));const iv=setInterval(()=>{c=Math.min(c+st,tgt);el.textContent=c;if(c>=tgt)clearInterval(iv);},40);}
+
+function setFT(v,btn){fTkt=v;document.querySelectorAll('.mtbar .chip:not(select)').forEach(b=>b.classList.remove('on'));btn.classList.add('on');applyF();}
+function applyF(){fKat=document.getElementById('fkh').value;renderM();}
+function focM(lat,lng){if(!lat||!lng)return;map.flyTo([lat,lng],12,{animate:true,duration:1});document.getElementById('map').scrollIntoView({behavior:'smooth',block:'center'});}
+
+function getGPS(){if(!navigator.geolocation)return showT('GPS tidak didukung','error');navigator.geolocation.getCurrentPosition(p=>{document.getElementById('fLat').value=p.coords.latitude.toFixed(6);document.getElementById('fLng').value=p.coords.longitude.toFixed(6);showT('Koordinat berhasil diambil!','success');},()=>showT('Gagal mendapatkan lokasi','error'));}
+
+async function submitL(){
+    const err=document.getElementById('fErr');err.style.display='none';
+    const b={jenis_hama:document.getElementById('fJH').value.trim(),kategori_hama:document.getElementById('fKat').value,tingkat_serangan:document.querySelector('input[name=tkt]:checked')?.value||'ringan',komoditas_terdampak:document.getElementById('fKom').value.trim(),luas_terdampak:document.getElementById('fLuas').value||null,deskripsi:document.getElementById('fDesc').value.trim(),provinsi:document.getElementById('fProv').value.trim(),kabupaten:document.getElementById('fKab').value.trim(),kecamatan:document.getElementById('fKec').value.trim(),latitude:document.getElementById('fLat').value||null,longitude:document.getElementById('fLng').value||null};
+    if(!b.jenis_hama||!b.komoditas_terdampak||!b.provinsi){err.textContent='Jenis hama, komoditas, dan provinsi wajib diisi!';err.style.display='block';return;}
+    try{
+        const r=await fetch('/api/hama',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)});
+        const j=await r.json();
+        if(j.sukses){showT('Laporan terkirim! '+(j.verified?'✓ Terverifikasi':'Menunggu verifikasi'),'success');['fJH','fKom','fLuas','fDesc','fKec','fLat','fLng'].forEach(id=>document.getElementById(id).value='');document.getElementById('sr').checked=true;await loadPeta();await loadRadar();await loadStats();}
+        else{err.textContent=j.pesan;err.style.display='block';}
+    }catch{err.textContent='Terjadi kesalahan.';err.style.display='block';}
+}
+
+function showT(msg,type='success'){const t=document.getElementById('toast');document.getElementById('tMsg').textContent=msg;t.className=`toast ${type}`;t.querySelector('i').className=`fas fa-${type==='success'?'check-circle':'exclamation-circle'}`;setTimeout(()=>t.classList.add('show'),10);setTimeout(()=>t.classList.remove('show'),3500);}
+
+document.addEventListener('DOMContentLoaded',initMap);
+</script>
+</body>
+</html>

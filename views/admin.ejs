@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel Admin — Sinar Tani</title>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:'Segoe UI',sans-serif;background:#f0f4f0;color:#333;}
+.mc{margin-left:260px;padding:24px;}
+.aheader{background:linear-gradient(135deg,#1e3d1a,#2d5a27);border-radius:18px;padding:26px 32px;color:#fff;margin-bottom:22px;display:flex;justify-content:space-between;align-items:center;}
+.aheader h1{font-size:1.6rem;display:flex;align-items:center;gap:10px;}
+.aheader p{color:rgba(255,255,255,.7);margin-top:4px;font-size:.88rem;}
+.crown{background:rgba(252,211,77,.2);border:1px solid rgba(252,211,77,.4);padding:7px 16px;border-radius:25px;color:#fcd34d;font-size:.82rem;font-weight:700;}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px;}
+.sc{background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;overflow:hidden;}
+.sc::after{content:'';position:absolute;right:-15px;top:-15px;width:65px;height:65px;border-radius:50%;opacity:.07;}
+.sc.g::after{background:#4CAF50;} .sc.b::after{background:#2563eb;} .sc.o::after{background:#f59e0b;} .sc.r::after{background:#ef4444;}
+.si{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:10px;}
+.si.g{background:#dcfce7;color:#16a34a;} .si.b{background:#dbeafe;color:#2563eb;}
+.si.o{background:#fef3c7;color:#d97706;} .si.r{background:#fee2e2;color:#dc2626;}
+.sv{font-size:2rem;font-weight:700;color:#1a1a1a;}
+.sl{font-size:.78rem;color:#888;margin-top:3px;}
+.apulse{position:absolute;right:12px;top:12px;width:8px;height:8px;border-radius:50%;background:#ef4444;animation:ap 1.5s infinite;}
+@keyframes ap{0%,100%{box-shadow:0 0 0 0 rgba(239,68,68,.5);}50%{box-shadow:0 0 0 7px rgba(239,68,68,0);}}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:18px;}
+.panel{background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.06);overflow:hidden;}
+.ph{padding:16px 22px;border-bottom:1px solid #f3f4f6;display:flex;justify-content:space-between;align-items:center;}
+.pt{font-size:.95rem;font-weight:700;color:#1a1a1a;display:flex;align-items:center;gap:7px;}
+.pb-body{padding:16px;}
+/* User table */
+.utbl{width:100%;border-collapse:collapse;font-size:.83rem;}
+.utbl th{padding:9px 12px;background:#f8f9fa;color:#555;font-weight:600;text-align:left;border-bottom:2px solid #f3f4f6;}
+.utbl td{padding:9px 12px;border-bottom:1px solid #f9fafb;vertical-align:middle;}
+.utbl tr:hover td{background:#fafafa;}
+.rp{padding:2px 9px;border-radius:10px;font-size:.7rem;font-weight:700;}
+.rp-a{background:#fee2e2;color:#dc2626;} .rp-p{background:#dcfce7;color:#16a34a;}
+.rp-k{background:#dbeafe;color:#1d4ed8;} .rp-d{background:#ede9fe;color:#7c3aed;}
+.abtn{padding:4px 11px;border:none;border-radius:7px;cursor:pointer;font-size:.75rem;font-weight:600;transition:all .2s;}
+.abtn.v{background:#dcfce7;color:#16a34a;} .abtn.v:hover{background:#bbf7d0;}
+.abtn.s{background:#fee2e2;color:#dc2626;} .abtn.s:hover{background:#fecaca;}
+.abtn.h{background:#fef3c7;color:#d97706;} .abtn.h:hover{background:#fde68a;}
+/* Hama list */
+.hl{display:flex;flex-direction:column;gap:8px;max-height:380px;overflow-y:auto;}
+.hi{display:flex;align-items:flex-start;gap:10px;padding:12px;background:#fafafa;border-radius:11px;border:1px solid #f3f4f6;}
+.hbar{width:4px;align-self:stretch;border-radius:3px;flex-shrink:0;}
+.hk{background:#dc2626;} .hb2{background:#ef4444;} .hs{background:#f59e0b;} .hr{background:#22c55e;}
+.hi-info{flex:1;min-width:0;}
+.hi-name{font-weight:700;font-size:.88rem;color:#1a1a1a;margin-bottom:3px;}
+.hi-meta{font-size:.75rem;color:#888;display:flex;gap:8px;flex-wrap:wrap;}
+.hbadge{padding:2px 8px;border-radius:8px;font-size:.7rem;font-weight:700;flex-shrink:0;}
+.hbk{background:#fee2e2;color:#dc2626;} .hbb{background:#fee2e2;color:#ef4444;}
+.hbs{background:#fef3c7;color:#d97706;} .hbr{background:#dcfce7;color:#16a34a;}
+.utag{font-size:.68rem;background:#fef3c7;color:#92400e;padding:1px 7px;border-radius:7px;border:1px solid #fbbf24;}
+/* Role bars */
+.rbar-wrap{display:flex;flex-direction:column;gap:11px;}
+.rbar-row{display:flex;align-items:center;gap:10px;}
+.rbar-lbl{width:75px;font-size:.8rem;font-weight:600;color:#555;}
+.rbar-bg{flex:1;height:9px;background:#f3f4f6;border-radius:5px;overflow:hidden;}
+.rbar-fill{height:100%;border-radius:5px;transition:width 1s ease;}
+.rbar-n{font-size:.8rem;font-weight:700;min-width:22px;text-align:right;}
+.lnk{padding:6px 14px;background:#2d5a27;color:#fff;border-radius:16px;text-decoration:none;font-size:.78rem;font-weight:600;}
+.lnk:hover{background:#4CAF50;}
+/* Search */
+.srch{display:flex;gap:8px;align-items:center;}
+.srch input,.srch select{padding:7px 12px;border:1.5px solid #e5e7eb;border-radius:20px;font-size:.82rem;outline:none;}
+.srch input:focus,.srch select:focus{border-color:#4CAF50;}
+.toast{position:fixed;bottom:24px;right:24px;padding:12px 20px;border-radius:12px;color:#fff;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.2);transform:translateY(60px);opacity:0;transition:all .4s;z-index:9999;display:flex;align-items:center;gap:8px;}
+.toast.show{transform:translateY(0);opacity:1;}
+.toast.s{background:linear-gradient(135deg,#059669,#10b981);}
+.toast.e{background:linear-gradient(135deg,#dc2626,#ef4444);}
+@media(max-width:1200px){.stats{grid-template-columns:repeat(2,1fr);}.grid2{grid-template-columns:1fr;}}
+@media(max-width:1024px){.mc{margin-left:0;}}
+</style>
+</head>
+<body>
+<%- include('partials/sidebar', { active: 'admin' }) %>
+<main class="mc">
+  <div class="aheader">
+    <div><h1><i class="fas fa-shield-alt"></i> Panel Admin</h1><p>Kelola pengguna, laporan hama, dan konten platform</p></div>
+    <div class="crown"><i class="fas fa-crown"></i> <%= user.nama %></div>
+  </div>
+
+  <div class="stats">
+    <div class="sc g"><div class="si g"><i class="fas fa-users"></i></div><div class="sv"><%= stats.users %></div><div class="sl">Pengguna Aktif</div></div>
+    <div class="sc b"><div class="si b"><i class="fas fa-store"></i></div><div class="sv"><%= stats.produk %></div><div class="sl">Produk di Pasar</div></div>
+    <div class="sc o"><div class="apulse"></div><div class="si o"><i class="fas fa-exclamation-triangle"></i></div><div class="sv"><%= stats.hama_aktif %></div><div class="sl">Hama Aktif</div></div>
+    <div class="sc r"><div class="apulse"></div><div class="si r"><i class="fas fa-skull-crossbones"></i></div><div class="sv"><%= stats.hama_kritis %></div><div class="sl">Status Kritis</div></div>
+  </div>
+
+  <div class="grid2">
+    <!-- Distribusi peran -->
+    <div class="panel">
+      <div class="ph"><div class="pt"><i class="fas fa-users" style="color:#4CAF50;"></i> Distribusi Pengguna</div></div>
+      <div class="pb-body">
+        <div class="rbar-wrap">
+          <% const total = stats.petani + stats.kader + stats.dinas || 1; %>
+          <div class="rbar-row"><span class="rbar-lbl">🌾 Petani</span><div class="rbar-bg"><div class="rbar-fill" style="width:<%=Math.round(stats.petani/total*100)%>%;background:#4CAF50;"></div></div><span class="rbar-n"><%= stats.petani %></span></div>
+          <div class="rbar-row"><span class="rbar-lbl">🤝 Kader</span><div class="rbar-bg"><div class="rbar-fill" style="width:<%=Math.round(stats.kader/total*100)%>%;background:#2563eb;"></div></div><span class="rbar-n"><%= stats.kader %></span></div>
+          <div class="rbar-row"><span class="rbar-lbl">🏛️ Dinas</span><div class="rbar-bg"><div class="rbar-fill" style="width:<%=Math.round(stats.dinas/total*100)%>%;background:#7c3aed;"></div></div><span class="rbar-n"><%= stats.dinas %></span></div>
+        </div>
+        <hr style="margin:18px 0;border:none;border-top:1px solid #f3f4f6;">
+        <div style="display:flex;gap:10px;">
+          <div style="flex:1;text-align:center;padding:12px;background:#f8f9fa;border-radius:10px;"><div style="font-size:1.4rem;font-weight:700;color:#d97706;"><%= stats.hama_unverified %></div><div style="font-size:.75rem;color:#888;margin-top:2px;">Laporan Belum Diverifikasi</div></div>
+          <div style="flex:1;text-align:center;padding:12px;background:#f8f9fa;border-radius:10px;"><div style="font-size:1.4rem;font-weight:700;color:#2d5a27;"><%= stats.bantuan %></div><div style="font-size:.75rem;color:#888;margin-top:2px;">Program Bantuan Aktif</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Laporan hama terbaru -->
+    <div class="panel">
+      <div class="ph"><div class="pt"><i class="fas fa-broadcast-tower" style="color:#ef4444;"></i> Laporan Hama Terbaru</div><a href="/k-map" class="lnk">Lihat Peta</a></div>
+      <div class="pb-body">
+        <div class="hl">
+          <% recentHama.forEach(h => { %>
+          <div class="hi" id="hi-<%= h._id %>">
+            <div class="hbar h<%= h.tingkat_serangan.charAt(0) %>"></div>
+            <div class="hi-info">
+              <div class="hi-name"><%= h.jenis_hama %> <% if(!h.verified){%><span class="utag">Belum diverifikasi</span><%}%></div>
+              <div class="hi-meta"><span>🌱 <%= h.komoditas_terdampak %></span><span>📍 <%= h.kabupaten||h.provinsi||'—' %></span><span>👤 <%= h.user_id?.nama||'—' %></span></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end;flex-shrink:0;">
+              <span class="hbadge hb<%= h.tingkat_serangan.charAt(0) %>"><%= h.tingkat_serangan %></span>
+              <% if(!h.verified){%><button class="abtn v" onclick="verifyHama('<%= h._id %>')"><i class="fas fa-check"></i></button><%}%>
+              <% if(h.status==='aktif'){%><button class="abtn h" onclick="updateStatus('<%= h._id %>','ditangani')"><i class="fas fa-wrench"></i></button><%}%>
+              <% if(h.status==='ditangani'){%><button class="abtn s" onclick="updateStatus('<%= h._id %>','selesai')"><i class="fas fa-flag-checkered"></i></button><%}%>
+            </div>
+          </div>
+          <% }) %>
+          <% if(!recentHama.length){%><div style="text-align:center;padding:20px;color:#999;"><i class="fas fa-check-circle" style="color:#22c55e;font-size:1.5rem;"></i><br><small>Tidak ada laporan hama</small></div><%}%>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- User Table -->
+  <div class="panel">
+    <div class="ph">
+      <div class="pt"><i class="fas fa-users-cog" style="color:#4CAF50;"></i> Manajemen Pengguna</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <div class="srch">
+          <input type="text" id="usrSearch" placeholder="Cari nama / email..." onkeyup="filterUsers()">
+          <select id="roleFilter" onchange="filterUsers()">
+            <option value="">Semua Peran</option><option value="petani">Petani</option><option value="kader">Kader</option><option value="dinas">Dinas</option><option value="admin">Admin</option>
+          </select>
+        </div>
+        <button onclick="exportUsers()" class="abtn v" style="padding:8px 16px;"><i class="fas fa-download"></i> Export CSV</button>
+      </div>
+    </div>
+    <div style="overflow-x:auto;">
+      <table class="utbl" id="utbl">
+        <thead><tr><th>#</th><th>Nama</th><th>Email</th><th>Peran</th><th>Info</th><th>Wilayah</th><th>Status</th><th>Aksi</th></tr></thead>
+        <tbody>
+          <% recentUsers.forEach((u,i) => { %>
+          <tr id="ur-<%= u._id %>" data-nama="<%= u.nama.toLowerCase() %>" data-email="<%= u.email %>" data-peran="<%= u.peran %>">
+            <td style="color:#aaa;font-size:.78rem;"><%= i+1 %></td>
+            <td><strong><%= u.nama %></strong></td>
+            <td style="color:#666;font-size:.82rem;"><%= u.email %></td>
+            <td><span class="rp rp-<%= u.peran.charAt(0) %>"><%- {admin:'👑 Admin',petani:'🌾 Petani',kader:'🤝 Kader',dinas:'🏛️ Dinas'}[u.peran] %></span></td>
+            <td style="font-size:.8rem;color:#888;"><% if(u.peran==='kader'&&u.kelompok_tani){%><i class="fas fa-users" style="color:#2563eb;"></i> <%=u.kelompok_tani%><%}else{%>—<%}%></td>
+            <td style="font-size:.8rem;color:#666;"><%= u.provinsi||'—' %></td>
+            <td><span style="color:<%= u.aktif?'#16a34a':'#dc2626' %>;font-size:.8rem;font-weight:600;"><i class="fas fa-circle" style="font-size:.5rem;"></i> <%= u.aktif?'Aktif':'Nonaktif' %></span></td>
+            <td>
+              <div style="display:flex;gap:5px;">
+                <% if(u.peran!=='admin'){ %>
+                <button class="abtn <%= u.aktif?'s':'v' %>" onclick="toggleUser('<%= u._id %>',<%= u.aktif?0:1 %>)"><%= u.aktif?'Suspend':'Aktifkan' %></button>
+                <% if(u.peran!=='kader'){ %><button class="abtn h" onclick="promoteKader('<%= u._id %>')">→ Kader</button><% } %>
+                <% } else { %><span style="font-size:.75rem;color:#aaa;">—</span><% } %>
+              </div>
+            </td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function filterUsers(){
+  const q=document.getElementById('usrSearch').value.toLowerCase();
+  const role=document.getElementById('roleFilter').value;
+  document.querySelectorAll('#utbl tbody tr').forEach(tr=>{
+    const ok=(!q||(tr.dataset.nama+tr.dataset.email).includes(q))&&(!role||tr.dataset.peran===role);
+    tr.style.display=ok?'':'none';
+  });
+}
+
+// Export users to CSV
+function exportUsers() {
+  const rows = document.querySelectorAll('#utbl tbody tr');
+  if (!rows.length) {
+    toast('Tidak ada data untuk diekspor', 'e');
+    return;
+  }
+  
+  const headers = ['No', 'Nama', 'Email', 'Peran', 'Info', 'Wilayah', 'Status'];
+  const csvData = [headers.join(',')];
+  
+  rows.forEach((tr, idx) => {
+    if (tr.style.display !== 'none') {
+      const cells = tr.querySelectorAll('td');
+      const rowData = [
+        idx + 1,
+        `"${cells[1].querySelector('strong')?.textContent || ''}"`,
+        `"${cells[2].textContent || ''}"`,
+        `"${cells[3].querySelector('.rp')?.textContent || ''}"`,
+        `"${cells[4].textContent || ''}"`,
+        `"${cells[5].textContent || ''}"`,
+        `"${cells[6].textContent || ''}"`
+      ];
+      csvData.push(rowData.join(','));
+    }
+  });
+  
+  const csvContent = csvData.join('\n');
+  const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  const url = URL.createObjectURL(blob);
+  
+  link.setAttribute('href', url);
+  link.setAttribute('download', `users_${new Date().toISOString().split('T')[0]}.csv`);
+  link.style.visibility = 'hidden';
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  
+  toast('Data berhasil diekspor!', 's');
+}
+
+async function toggleUser(id,aktif){
+  const r=await fetch(`/api/admin/users/${id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({aktif})});
+  const j=await r.json();
+  if(j.sukses){toast(aktif?'Pengguna diaktifkan':'Pengguna disuspend',aktif?'s':'e');setTimeout(()=>location.reload(),1200);}
+}
+async function promoteKader(id){
+  if(!confirm('Jadikan pengguna ini sebagai Kader? Laporan hamannya akan auto-verified.'))return;
+  const r=await fetch(`/api/admin/users/${id}`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({peran:'kader'})});
+  const j=await r.json();
+  if(j.sukses){toast('Peran diubah ke Kader','s');setTimeout(()=>location.reload(),1200);}
+}
+async function verifyHama(id){
+  const r=await fetch(`/api/hama/${id}/verifikasi`,{method:'PATCH'});
+  const j=await r.json();
+  if(j.sukses){toast('Laporan terverifikasi!','s');document.querySelector(`#hi-${id} .utag`)?.remove();}
+}
+async function updateStatus(id,status){
+  const r=await fetch(`/api/hama/${id}/status`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({status})});
+  const j=await r.json();
+  if(j.sukses){toast('Status diperbarui','s');setTimeout(()=>location.reload(),1200);}
+}
+function toast(msg,type='s'){
+  const t=document.getElementById('toast');
+  t.innerHTML=`<i class="fas fa-${type==='s'?'check-circle':'exclamation-circle'}"></i>${msg}`;
+  t.className=`toast ${type}`;
+  setTimeout(()=>t.classList.add('show'),10);
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+</script>
+</body>
+</html>

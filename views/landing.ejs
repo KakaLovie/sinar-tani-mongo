@@ -533,7 +533,304 @@
             font-size: 0.9rem;
         }
 
-        /* Animations */
+        /* About Section */
+        .about-section {
+            padding: 100px 0;
+            background: linear-gradient(180deg, transparent 0%, rgba(22, 163, 74, 0.03) 100%);
+        }
+        .about-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 48px;
+            align-items: start;
+        }
+        .developer-card {
+            background: white;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(22, 163, 74, 0.1);
+        }
+        .developer-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary), var(--accent));
+        }
+        .developer-avatar-wrapper {
+            width: 140px;
+            height: 140px;
+            margin: 0 auto 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-light), var(--secondary));
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: pulse-glow 3s infinite ease-in-out;
+        }
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(22, 163, 74, 0.4); }
+            50% { box-shadow: 0 0 40px rgba(22, 163, 74, 0.6); }
+        }
+        .developer-avatar {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #1f2937, #374151);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+            color: white;
+            font-weight: 900;
+            border: 4px solid white;
+        }
+        .developer-name {
+            text-align: center;
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text);
+            margin-bottom: 8px;
+        }
+        .developer-title {
+            text-align: center;
+            font-size: 1rem;
+            color: var(--primary);
+            font-weight: 700;
+            margin-bottom: 20px;
+            display: inline-block;
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #dcfce7, #86efac);
+            border-radius: 20px;
+        }
+        .developer-school {
+            text-align: center;
+            font-size: 0.95rem;
+            color: var(--muted);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        .developer-school i {
+            color: var(--primary);
+        }
+        .welcome-message {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            padding: 24px;
+            border-radius: 16px;
+            border-left: 4px solid var(--primary);
+            margin-top: 20px;
+        }
+        .welcome-message p {
+            font-size: 0.95rem;
+            line-height: 1.8;
+            color: var(--text);
+            font-style: italic;
+        }
+        .welcome-message .quote-icon {
+            font-size: 2rem;
+            color: var(--primary);
+            opacity: 0.3;
+            margin-bottom: 8px;
+        }
+        .vision-mission-card {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        .vm-card {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(22, 163, 74, 0.1);
+            transition: all 0.3s ease;
+        }
+        .vm-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 40px rgba(22, 163, 74, 0.15);
+        }
+        .vm-card.vision {
+            border-top: 4px solid var(--primary);
+        }
+        .vm-card.mission {
+            border-top: 4px solid var(--secondary);
+        }
+        .vm-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .vm-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+        .vision .vm-icon {
+            background: linear-gradient(135deg, #dcfce7, #86efac);
+            color: var(--primary);
+        }
+        .mission .vm-icon {
+            background: linear-gradient(135deg, #e0e7ff, #a5b4fc);
+            color: var(--secondary);
+        }
+        .vm-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .vm-content {
+            color: var(--muted);
+            line-height: 1.8;
+        }
+        .vm-content ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        .vm-content li {
+            padding: 8px 0 8px 28px;
+            position: relative;
+        }
+        .vm-content li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--primary);
+            font-weight: 900;
+            font-size: 1.1rem;
+        }
+        .timeline-card {
+            background: white;
+            border-radius: 20px;
+            padding: 32px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(22, 163, 74, 0.1);
+            margin-top: 24px;
+        }
+        .timeline-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 24px;
+        }
+        .timeline-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #fef3c7, #fcd34d);
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+        }
+        .timeline-title {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: var(--text);
+        }
+        .timeline {
+            position: relative;
+            padding-left: 30px;
+        }
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 8px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(180deg, var(--primary), var(--secondary));
+        }
+        .timeline-item {
+            position: relative;
+            padding-bottom: 24px;
+        }
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+        .timeline-dot {
+            position: absolute;
+            left: -26px;
+            top: 4px;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: white;
+            border: 3px solid var(--primary);
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.1);
+        }
+        .timeline-item.active .timeline-dot {
+            background: var(--primary);
+            box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.2);
+            animation: timeline-pulse 2s infinite;
+        }
+        @keyframes timeline-pulse {
+            0%, 100% { box-shadow: 0 0 0 4px rgba(22, 163, 74, 0.2); }
+            50% { box-shadow: 0 0 0 8px rgba(22, 163, 74, 0.1); }
+        }
+        .timeline-date {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+        .timeline-content {
+            font-size: 0.95rem;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+        .timeline-content strong {
+            color: var(--text);
+        }
+
+        /* Responsive */
+        @media (max-width: 968px) {
+            .about-grid {
+                grid-template-columns: 1fr;
+                gap: 32px;
+            }
+            .developer-card {
+                order: 1;
+            }
+            .vision-mission-card {
+                order: 2;
+            }
+        }
+        @media (max-width: 768px) {
+            .nav-links { display: none; }
+            .hero h1 { font-size: 2.2rem; }
+            .hero p { font-size: 1rem; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .stat-number { font-size: 1.8rem; }
+            .features-grid { grid-template-columns: 1fr; }
+            .section-header h2 { font-size: 2rem; }
+            .cta-box h2 { font-size: 1.8rem; }
+            .about-section { padding: 60px 0; }
+            .developer-card { padding: 28px; }
+            .developer-avatar-wrapper { width: 100px; height: 100px; }
+            .developer-avatar { font-size: 2.5rem; }
+            .developer-name { font-size: 1.5rem; }
+            .vm-card { padding: 24px; }
+            .timeline-card { padding: 24px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-animation">
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(40px); }
             to { opacity: 1; transform: translateY(0); }
@@ -691,6 +988,140 @@
         </div>
     </section>
 
+    <section class="about-section" id="tentang">
+        <div class="container">
+            <div class="section-header">
+                <div class="section-tag">
+                    <i class="fas fa-user-circle"></i> TENTANG APLIKASI
+                </div>
+                <h2>Dibuat dengan ❤️ untuk<br>Petani Indonesia</h2>
+                <p>Mengenal lebih dekat sosok developer dan tujuan pembuatan Sinar Tani</p>
+            </div>
+            <div class="about-grid">
+                <div class="developer-card">
+                    <div class="developer-avatar-wrapper">
+                        <div class="developer-avatar">KL</div>
+                    </div>
+                    <h3 class="developer-name">Kaka Lovie Chazanzie</h3>
+                    <div class="developer-title">
+                        <i class="fas fa-code"></i> Developer & Creator
+                    </div>
+                    <div class="developer-school">
+                        <i class="fas fa-school"></i>
+                        <span>Siswa Kelas 12 - SMAN 2 Kebumen</span>
+                    </div>
+                    <div class="welcome-message">
+                        <div class="quote-icon">
+                            <i class="fas fa-quote-left"></i>
+                        </div>
+                        <p>
+                            "Halo! Saya Kaka Lovie Chazanzie, seorang siswa kelas 12 di SMAN 2 Kebumen yang memiliki passion di bidang teknologi dan pertanian. 
+                            <br><br>
+                            Saya menciptakan Sinar Tani sebagai bentuk kontribusi nyata saya untuk membantu para petani Indonesia. Dengan teknologi ini, saya berharap dapat memberikan dampak positif bagi kesejahteraan petani dan kemajuan pertanian di tanah air.
+                            <br><br>
+                            Mari bersama-sama membangun pertanian Indonesia yang lebih modern dan sejahtera!"
+                        </p>
+                    </div>
+                </div>
+                <div>
+                    <div class="vision-mission-card">
+                        <div class="vm-card vision">
+                            <div class="vm-header">
+                                <div class="vm-icon">
+                                    <i class="fas fa-eye"></i>
+                                </div>
+                                <h3 class="vm-title">Visi</h3>
+                            </div>
+                            <div class="vm-content">
+                                <p>
+                                    Menjadikan Sinar Tani sebagai platform digital terdepan yang memberdayakan petani Indonesia melalui teknologi inovatif, 
+                                    menciptakan ekosistem pertanian yang berkelanjutan, dan meningkatkan kesejahteraan petani secara menyeluruh 
+                                    untuk ketahanan pangan nasional.
+                                </p>
+                            </div>
+                        </div>
+                        <div class="vm-card mission">
+                            <div class="vm-header">
+                                <div class="vm-icon">
+                                    <i class="fas fa-bullseye"></i>
+                                </div>
+                                <h3 class="vm-title">Misi</h3>
+                            </div>
+                            <div class="vm-content">
+                                <ul>
+                                    <li>Menyediakan platform digital yang mudah diakses dan digunakan oleh petani di seluruh Indonesia</li>
+                                    <li>Memberikan edukasi dan pelatihan pertanian modern melalui Kelas Tani</li>
+                                    <li>Membantu petani dalam memantau dan mengendalikan serangan hama dengan teknologi GIS</li>
+                                    <li>Menciptakan pasar digital yang adil tanpa perantara untuk hasil pertanian</li>
+                                    <li>Memfasilitasi akses informasi bantuan dan program pemerintah untuk petani</li>
+                                    <li>Membangun komunitas petani digital yang saling mendukung dan berbagi pengetahuan</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="timeline-card">
+                        <div class="timeline-header">
+                            <div class="timeline-icon">
+                                <i class="fas fa-calendar-alt"></i>
+                            </div>
+                            <h3 class="timeline-title">Alur Pengerjaan Proyek</h3>
+                        </div>
+                        <div class="timeline">
+                            <div class="timeline-item active">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-date">2 Februari 2026</div>
+                                <div class="timeline-content">
+                                    <strong>🚀 Kick-off Project</strong><br>
+                                    Mulai pengembangan Sinar Tani dengan perencanaan fitur dan arsitektur sistem
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-date">Februari 2026</div>
+                                <div class="timeline-content">
+                                    <strong>📐 Design & Planning</strong><br>
+                                    Perancangan UI/UX, database schema, dan infrastruktur backend
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-date">Maret 2026</div>
+                                <div class="timeline-content">
+                                    <strong>💻 Core Development</strong><br>
+                                    Pengembangan fitur utama: Dashboard, Kalkulator Tani, dan sistem autentikasi
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-date">April 2026</div>
+                                <div class="timeline-content">
+                                    <strong>🗺️ GIS Integration</strong><br>
+                                    Implementasi K-MAP dan sistem pemantauan hama berbasis peta digital
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-date">Mei 2026</div>
+                                <div class="timeline-content">
+                                    <strong>🛒 Marketplace Launch</strong><br>
+                                    Peluncuran fitur Pasar Tani dan sistem transaksi digital
+                                </div>
+                            </div>
+                            <div class="timeline-item">
+                                <div class="timeline-dot"></div>
+                                <div class="timeline-date">Juni 2026 (Target)</div>
+                                <div class="timeline-content">
+                                    <strong>🎓 Public Release</strong><br>
+                                    Peluncuran resmi Sinar Tani untuk publik dan deployment produksi
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
     <section class="cta-section">
         <div class="container">
             <div class="cta-box">
@@ -784,6 +1215,33 @@
             card.style.transform = 'translateY(30px)';
             card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
             observer.observe(card);
+        });
+
+        // Animate VM cards and Timeline
+        document.querySelectorAll('.vm-card, .timeline-card, .developer-card').forEach(card => {
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(30px)';
+            card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+            observer.observe(card);
+        });
+
+        // Animate timeline items sequentially
+        const timelineObserver = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateX(0)';
+                    }, index * 100);
+                }
+            });
+        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
+
+        document.querySelectorAll('.timeline-item').forEach(item => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-20px)';
+            item.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+            timelineObserver.observe(item);
         });
 
         // Load stats on page load
